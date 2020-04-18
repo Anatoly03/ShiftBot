@@ -20,6 +20,7 @@ namespace ShiftBot
         public static Block[,,] World;
         public static List<Player> Players = new List<Player>();
         public static List<MapInfo> maps;
+        public static MapInfo currentMap;
 
         public static int Width;
         public static int Height;
@@ -166,7 +167,6 @@ namespace ShiftBot
                     var playerExisting = Players.FirstOrDefault(p => p.Name == m.GetString(1).ToLower());
                     Players.Add(new Player(m.GetInt(0), m.GetString(1).ToLower()));
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
-                    Console.WriteLine(m);
                     break;
 
 

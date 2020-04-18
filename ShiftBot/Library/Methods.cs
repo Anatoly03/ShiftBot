@@ -137,6 +137,7 @@ namespace ShiftBot
                 buffer.Add(new LCoordinate(1, x, 87), new Block(12));
 
             await PlaceSign(49, 88, 58, $"{info.Title}\nBy {info.Creator}", 1);
+            currentMap = info;
 
             while (buffer.Count > 0)
             {
@@ -180,11 +181,74 @@ namespace ShiftBot
 
         public static async Task OpenEntrance()
         {
-            
+            var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
+
+            // Where is the entrance?
+            bool isEntranceLeft = false;
+            //bool isEntranceRight = false;
+
+            for (int y = 0; y < 22; y++)
+            {
+                if (map[1, 0, y].Id == 16)
+                {
+                    if (!isEntranceLeft)
+                    {
+                        isEntranceLeft = true;
+                        await PlaceBlock(1, 30, y + 63, 96);
+                    }
+                    for (int i = 0; i < 2; i++)
+                    {
+                        await PlaceBlock(1, 30 + i, y + 64, 15);
+                    }
+                }
+            }
+
         }
 
         public static async Task CloseEntrance()
         {
+            var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
+
+            // Where is the entrance?
+            bool isEntranceLeft = false;
+            //bool isEntranceRight = false;
+
+            for (int y = 0; y < 22; y++)
+            {
+                if (map[1, 0, y].Id == 16)
+                {
+                    if (!isEntranceLeft)
+                    {
+                        isEntranceLeft = true;
+                        await PlaceBlock(1, 30, y + 63, 14);
+                    }
+                    await PlaceBlock(1, 30, y + 64, 14);
+                    await PlaceBlock(1, 31, y + 64, 96);
+                    //await PlaceBlock(1, 32, y + 64, map[1, 0, y].Id);
+                }
+            }
+
+        }
+
+        public static async Task CreateExit()
+        {
+            var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
+
+            int coins = 0;
+            for (int y = 0; y < 22; y++)
+                for (int x = 0; x < 38; x++)
+                    if (map[1, 0, y].Id == 11)
+                        coins++;
+
+            /*
+            for (int y = 0; y < 22; y++)
+            {
+                if (map[1, 0, y].Id == 71)
+                {
+                    
+                }
+            }
+            */
 
         }
 
@@ -214,9 +278,11 @@ namespace ShiftBot
 
             Thread.Sleep(6000);
             await BuildMap(maps.ElementAt(new Random().Next(0, maps.Count)));
+            await CreateExit();
 
             Thread.Sleep(2000);
             await MakeGravity();
+            Thread.Sleep(1000);
             await OpenEntrance();
 
             Thread.Sleep(2000);
