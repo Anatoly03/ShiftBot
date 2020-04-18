@@ -19,6 +19,8 @@ namespace ShiftBot
         public static Connection Con;
         public static Block[,,] World;
         public static List<Player> Players = new List<Player>();
+        public static List<Player> PlayersInGame = new List<Player>();
+        public static List<Player> PlayersSafe = new List<Player>();
         public static List<MapInfo> maps;
         public static MapInfo currentMap;
 
@@ -27,8 +29,15 @@ namespace ShiftBot
         public static int BotId;
 
         private static DateTime startTime;
-        private static System.Timers.Timer tick;
+        private static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+
+        // Control Timers
+        private static System.Timers.Timer EntranceCooldown;
+        private static System.Timers.Timer EntranceMovement;
+
+        private static System.Timers.Timer Eliminator; // Eliminate after 5-20 seconds, after the first player arrived.
+        private static System.Timers.Timer TimeLimit; // Eliminate after 5-20 seconds, after the first player arrived.
 
         /*
          * Difficulties
@@ -157,8 +166,8 @@ namespace ShiftBot
                                 //await PlaceBlock(1, x, y, 80);*/
 
                     startTime = DateTime.Now;
-                    tick = new System.Timers.Timer(50);
-                    tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
+                    Tick = new System.Timers.Timer(50);
+                    Tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
 
                     break;
 
@@ -181,7 +190,24 @@ namespace ShiftBot
                     break;
 
                 case MessageType.PlayerMove:
-                    // Teleport players out of the game zone if they don#t belong there.
+                    player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
+
+                    {
+
+                        int x = (int) Math.Floor(m.GetDouble(5));
+                        int y = (int) Math.Floor(m.GetDouble(6));
+
+
+                        /*if (!player.afk)
+                        {
+
+                        }*/
+                    }
+
+                    break;
+
+                case MessageType.Won:
+                    await PlayerWon(Players.FirstOrDefault(p => p.Id == m.GetInt(0)));
                     break;
 
                 case MessageType.PlaceBlock:
@@ -267,7 +293,7 @@ namespace ShiftBot
                             case "start":
                                 if (player.IsMod)
                                 {
-                                    await StartGame();
+                                    await ContinueGame();
                                 }
                                 break;
                         }
@@ -280,7 +306,9 @@ namespace ShiftBot
         {
             TimeSpan ts = DateTime.Now - startTime;
             string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
-            await PlaceSign(47, 86, 58, $"{elapsedTime}", 1);
+            string display = elapsedTime + "s";
+
+            await PlaceSign(47, 86, 58, display, 1);
         }
     }
 }

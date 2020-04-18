@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using EEUniverse.Library;
 using Newtonsoft.Json;
 
@@ -43,6 +44,7 @@ namespace ShiftBot
         }
 
         public static async Task Say(string message) => await Con.SendAsync(MessageType.Chat, "[Bot] " + message);
+        public static async Task SayCommand(string message) => await Con.SendAsync(MessageType.Chat, "/" + message);
         public static async Task SayPrivate(string player, string msg) => await Con.SendAsync(MessageType.Chat, "/pm " + player + " [Bot] " + msg);
         public static async Task SayPrivate(Player player, string msg) => await Con.SendAsync(MessageType.Chat, "/pm " + player.Name + " [Bot] " + msg);
 
@@ -203,6 +205,18 @@ namespace ShiftBot
                 }
             }
 
+            // Prepare countdown to close the door.
+            EntranceCooldown = new System.Timers.Timer(5000);
+            EntranceCooldown.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                await CloseEntrance();
+                EntranceCooldown.Stop();
+            };
+
+            EntranceMovement = new System.Timers.Timer(500);
+            EntranceMovement.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                await CloseEntrance();
+                EntranceMovement.Stop();
+            };
         }
 
         public static async Task CloseEntrance()
@@ -255,6 +269,7 @@ namespace ShiftBot
         public static async Task ReleasePlayers()
         {
             await PlaceBlock(1, 46, 86, 13);
+            EntranceCooldown.Start();
         }
 
         public static async Task CreateSafeArea()
@@ -270,15 +285,60 @@ namespace ShiftBot
 
 
         /// <summary>
-        /// Start a running game process
+        /// Start or continue a running game process
         /// </summary>
-        public static async Task StartGame()
+        public static async Task ContinueGame()
         {
+            if (Tick != null)
+                Tick.Stop();
+            if (Eliminator != null)
+                Eliminator.Stop();
+            if (TimeLimit != null)
+                TimeLimit.Stop();
+
             await ClearGameArea();
 
             Thread.Sleep(6000);
             await BuildMap(maps.ElementAt(new Random().Next(0, maps.Count)));
             await CreateExit();
+
+            if (PlayersSafe.Count < 2)
+            {
+                PlayersInGame = new List<Player>();
+                PlayersSafe = new List<Player>();
+
+                foreach (Player p in Players)
+                {
+                    await SayCommand($"reset {p.Name}");
+                    await SayCommand($"tp {p.Name} 47 86");
+                    PlayersInGame.Add(p);
+                }
+            }
+            else
+            {
+                PlayersInGame = new List<Player>();
+
+                foreach (Player p in PlayersSafe)
+                {
+                    PlayersInGame.Add(p);
+                }
+
+                PlayersSafe = new List<Player>();
+            }
+
+            TimeLimit = new System.Timers.Timer(2 * 60 * 1000);
+            TimeLimit.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                await ContinueGame();
+                TimeLimit.Stop();
+                await Say($"Time over!");
+            };
+
+            int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+            Eliminator = new System.Timers.Timer(k);
+            Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                await ContinueGame();
+                Eliminator.Stop();
+            };
 
             Thread.Sleep(2000);
             await MakeGravity();
@@ -288,15 +348,41 @@ namespace ShiftBot
             Thread.Sleep(2000);
             await ReleasePlayers();
             startTime = DateTime.Now;
+            TimeLimit.Start();
 
             Thread.Sleep(5000);
             await CreateSafeArea();
-            tick.Start();
-            await CloseEntrance();
+            Tick.Start();
+        }
 
-            Thread.Sleep(10000);
-            tick.Stop();
-            await StartGame();
+        /// <summary>
+        /// Occurs when any player touched the crown.
+        /// </summary>
+        public static async Task PlayerWon(Player player)
+        {
+            if (PlayersSafe.Count == 0) // First
+            {
+                int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+                string s = " {k} seconds left!";
+                await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
+                Eliminator.Start();
+            }
+
+            if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
+            {
+                PlayersSafe.Add(player);
+                await SayCommand($"reset {player.Name}");
+                await SayCommand($"tp {player.Name} 47 86");
+
+                TimeSpan ts = DateTime.Now - startTime;
+                string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
+                await SayPrivate(player, $"Your Time: {elapsedTime}s");
+            }
+
+            if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
+            {
+                await ContinueGame();
+            }
         }
     }
 }
