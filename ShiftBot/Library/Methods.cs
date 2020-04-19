@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using Console = Colorful.Console;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -48,6 +50,8 @@ namespace ShiftBot
         public static async Task SayPrivate(string player, string msg) => await Con.SendAsync(MessageType.Chat, "/pm " + player + " [Bot] " + msg);
         public static async Task SayPrivate(Player player, string msg) => await Con.SendAsync(MessageType.Chat, "/pm " + player.Name + " [Bot] " + msg);
 
+        public static string TimeToString(TimeSpan ts) => String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10) +  "s";
+
         /*
          * General methods
          */
@@ -93,7 +97,7 @@ namespace ShiftBot
                         game[l, x - 31, y - 64] = World[l, x, y];
 
             int n = 0;
-            foreach (MapInfo k in maps)
+            foreach (MapInfo k in Maps)
                 n = Math.Max(n, k.Id);
             n++;
 
@@ -105,7 +109,7 @@ namespace ShiftBot
                 file.WriteLine(serializer);
             }
 
-            maps.Add(new MapInfo
+            Maps.Add(new MapInfo
             {
                 Id = n,
                 Title = "Untitled Map"
@@ -113,7 +117,7 @@ namespace ShiftBot
 
             using (StreamWriter file = File.CreateText($"../../../levels/list.json"))
             {
-                var serializer = JsonConvert.SerializeObject(maps, Json_settings);
+                var serializer = JsonConvert.SerializeObject(Maps, Json_settings);
                 file.WriteLine(serializer);
             }
 
@@ -122,7 +126,7 @@ namespace ShiftBot
 
         public static async Task BuildMap(int id)
         {
-            await BuildMap(maps.FirstOrDefault(m => m.Id == id));
+            await BuildMap(Maps.FirstOrDefault(m => m.Id == id));
         }
 
         public static async Task BuildMap(MapInfo info)
@@ -174,7 +178,7 @@ namespace ShiftBot
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
-                    Thread.Sleep(5);
+                    Thread.Sleep(10);
                     await PlaceBlock(pair.Key.L, pair.Key.X, pair.Key.Y, pair.Value.Id);
                 }
                 buffer.Remove(pair.Key);
@@ -275,6 +279,7 @@ namespace ShiftBot
         public static async Task CreateSafeArea()
         {
             await PlaceBlock(1, 46, 86, 96);
+            await PlaceBlock(1, 47, 86, 0);
             await PlaceBlock(1, 49, 86, 70);
         }
 
@@ -299,13 +304,17 @@ namespace ShiftBot
             await ClearGameArea();
 
             Thread.Sleep(6000);
-            await BuildMap(maps.ElementAt(new Random().Next(0, maps.Count)));
+            await BuildMap(Maps.ElementAt(new Random().Next(0, Maps.Count)));
             await CreateExit();
 
+            Console.Write("GAME!", Color.IndianRed);
             if (PlayersSafe.Count < 2)
             {
+                Console.WriteLine(" START!");
+                round = 1;
+
                 PlayersInGame = new List<Player>();
-                PlayersSafe = new List<Player>();
+                PlayersSafe = new Dictionary<Player, TimeSpan>();
 
                 foreach (Player p in Players)
                 {
@@ -316,33 +325,33 @@ namespace ShiftBot
             }
             else
             {
+                Console.WriteLine(" CONTINUE!");
+                round++;
+
                 PlayersInGame = new List<Player>();
 
-                foreach (Player p in PlayersSafe)
+                foreach (KeyValuePair<Player, TimeSpan> p in PlayersSafe)
                 {
-                    PlayersInGame.Add(p);
+                    PlayersInGame.Add(p.Key);
                 }
 
-                PlayersSafe = new List<Player>();
+                PlayersSafe = new Dictionary<Player, TimeSpan>();
             }
 
-            TimeLimit = new System.Timers.Timer(2 * 60 * 1000);
+            TimeLimit = new System.Timers.Timer(150 * 1000);
             TimeLimit.Elapsed += async (Object s, ElapsedEventArgs e) => {
-                await ContinueGame();
-                TimeLimit.Stop();
                 await Say($"Time over!");
+                await ContinueGame();
             };
 
             int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
             Eliminator = new System.Timers.Timer(k);
             Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
                 await ContinueGame();
-                Eliminator.Stop();
             };
 
             Thread.Sleep(2000);
             await MakeGravity();
-            Thread.Sleep(1000);
             await OpenEntrance();
 
             Thread.Sleep(2000);
@@ -350,7 +359,7 @@ namespace ShiftBot
             startTime = DateTime.Now;
             TimeLimit.Start();
 
-            Thread.Sleep(5000);
+            Thread.Sleep(2000);
             await CreateSafeArea();
             Tick.Start();
         }
@@ -360,27 +369,33 @@ namespace ShiftBot
         /// </summary>
         public static async Task PlayerWon(Player player)
         {
+            TimeSpan ts = DateTime.Now - startTime;
+
             if (PlayersSafe.Count == 0) // First
             {
+                firstPerson = DateTime.Now;
+
                 int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                string s = " {k} seconds left!";
+                string s = "{k} seconds left!";
                 await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
                 Eliminator.Start();
             }
 
             if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
             {
-                PlayersSafe.Add(player);
+                PlayersSafe.Add(player, ts);
                 await SayCommand($"reset {player.Name}");
                 await SayCommand($"tp {player.Name} 47 86");
 
-                TimeSpan ts = DateTime.Now - startTime;
                 string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
                 await SayPrivate(player, $"Your Time: {elapsedTime}s");
+                await UpdateSign();
             }
 
             if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
             {
+                if (Tick != null)
+                    Tick.Stop();
                 await ContinueGame();
             }
         }

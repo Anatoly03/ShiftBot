@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using Console = Colorful.Console;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -19,25 +21,29 @@ namespace ShiftBot
         public static Connection Con;
         public static Block[,,] World;
         public static List<Player> Players = new List<Player>();
+        public static Dictionary<string, Profile> Profiles = new Dictionary<string, Profile>();
         public static List<Player> PlayersInGame = new List<Player>();
-        public static List<Player> PlayersSafe = new List<Player>();
-        public static List<MapInfo> maps;
+        public static Dictionary<Player, TimeSpan> PlayersSafe = new Dictionary<Player, TimeSpan>();
+        public static List<MapInfo> Maps;
         public static MapInfo currentMap;
 
         public static int Width;
         public static int Height;
         public static int BotId;
 
-        private static DateTime startTime;
-        private static System.Timers.Timer Tick;
+        public static DateTime startTime = DateTime.Now;
+        public static DateTime firstPerson;
+        public static int round;
+
+        public static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
 
         // Control Timers
-        private static System.Timers.Timer EntranceCooldown;
-        private static System.Timers.Timer EntranceMovement;
+        public static System.Timers.Timer EntranceCooldown;
+        public static System.Timers.Timer EntranceMovement;
 
-        private static System.Timers.Timer Eliminator; // Eliminate after 5-20 seconds, after the first player arrived.
-        private static System.Timers.Timer TimeLimit; // Eliminate after 5-20 seconds, after the first player arrived.
+        public static System.Timers.Timer Eliminator; // Eliminate after 5-20 seconds, after the first player arrived.
+        public static System.Timers.Timer TimeLimit; // Eliminate after 5-20 seconds, after the first player arrived.
 
         /*
          * Difficulties
@@ -59,7 +65,12 @@ namespace ShiftBot
             /*
              * All the saved map non-blocks informations
              */
-            maps = JsonConvert.DeserializeObject<List<MapInfo>>(File.ReadAllText("../../../levels/list.json"), Json_settings);
+            Maps = JsonConvert.DeserializeObject<List<MapInfo>>(File.ReadAllText("../../../levels/list.json"), Json_settings);
+
+            /*
+             * All the saved profiles
+             */
+            Profiles = JsonConvert.DeserializeObject<Dictionary<string, Profile>>(File.ReadAllText("../../../profiles.json"), Json_settings);
 
             await Main2(File.ReadAllLines("../../../cookie.txt"));
         }
@@ -112,6 +123,7 @@ namespace ShiftBot
                 case MessageType.Init:
 
                     Console.WriteLine("Logged in!");
+                    Console.WriteLine();
                     await Say($"Connected!");
 
                     World = new Block[2, m.GetInt(9), m.GetInt(10)];
@@ -176,12 +188,34 @@ namespace ShiftBot
                     var playerExisting = Players.FirstOrDefault(p => p.Name == m.GetString(1).ToLower());
                     Players.Add(new Player(m.GetInt(0), m.GetString(1).ToLower()));
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
+
+                    if (player.IsMod)
+                    {
+                        Console.Write(player.Name, Color.Orange);
+                        await SayCommand($"giveedit {player.Name}");
+                    }
+                    else
+                    {
+                        Console.Write(player.Name, Color.Silver);
+                    }
+                    Console.WriteLine(" joined!");
+
                     break;
 
 
                 case MessageType.PlayerExit:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
                     Players.RemoveAll(p => p.Id == m.GetInt(0));
+
+                    if (player.IsMod)
+                    {
+                        Console.Write(player.Name, Color.Orange);
+                    }
+                    else
+                    {
+                        Console.Write(player.Name, Color.Silver);
+                    }
+                    Console.WriteLine(" left!");
                     break;
 
                 case MessageType.PlayerGod:
@@ -283,17 +317,18 @@ namespace ShiftBot
                                 }
                                 break;
 
-                            case "build":
-                                if (player.IsMod)
-                                {
-                                    await BuildMap(maps.ElementAt(new Random().Next(0, maps.Count)));
-                                }
-                                break;
-
+                            case "kill":
                             case "start":
                                 if (player.IsMod)
                                 {
                                     await ContinueGame();
+                                }
+                                break;
+
+                            case "scan":
+                                if (player.IsMod && param.Length > 1)
+                                {
+                                    //await OpenScanner(param[1]);
                                 }
                                 break;
                         }
@@ -304,11 +339,34 @@ namespace ShiftBot
 
         static async Task TickEvent(Object s, ElapsedEventArgs e)
         {
-            TimeSpan ts = DateTime.Now - startTime;
-            string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
-            string display = elapsedTime + "s";
+            await UpdateSign();
+        }
 
-            await PlaceSign(47, 86, 58, display, 1);
+        static async Task UpdateSign()
+        {
+            if (PlayersSafe.Count > 0)
+            {
+                TimeSpan ts = DateTime.Now - startTime;
+                string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
+
+                string display = TimeToString((TimeSpan)(DateTime.Now - startTime));
+
+                if (PlayersSafe.Count > 2)
+                    for (int i = PlayersSafe.Count - 3; i < PlayersSafe.Count; i++)
+                    {
+                        display += $"\n{i + 1}. {PlayersSafe.ElementAt(i).Key.Name.ToUpper()} {TimeToString(PlayersSafe.ElementAt(i).Value)}";
+                    }
+                else if (PlayersSafe.Count == 2)
+                {
+                    display += $"\n1. {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} {TimeToString(PlayersSafe.ElementAt(0).Value)}";
+                    display += $"\n2. {PlayersSafe.ElementAt(1).Key.Name.ToUpper()} {TimeToString(PlayersSafe.ElementAt(1).Value)}";
+                }
+                else
+                    display += $"\n1. {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} {TimeToString(PlayersSafe.ElementAt(0).Value)}";
+
+
+                await PlaceSign(47, 86, 58, display, 1);
+            }
         }
     }
 }
