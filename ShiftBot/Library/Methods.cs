@@ -225,27 +225,29 @@ namespace ShiftBot
 
         public static async Task CloseEntrance()
         {
-            var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
-
-            // Where is the entrance?
-            bool isEntranceLeft = false;
-            //bool isEntranceRight = false;
-
-            for (int y = 0; y < 22; y++)
+            if (!isBuilding)
             {
-                if (map[1, 0, y].Id == 16)
+                var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
+
+                // Where is the entrance?
+                bool isEntranceLeft = false;
+                //bool isEntranceRight = false;
+
+                for (int y = 0; y < 22; y++)
                 {
-                    if (!isEntranceLeft)
+                    if (map[1, 0, y].Id == 16)
                     {
-                        isEntranceLeft = true;
-                        await PlaceBlock(1, 30, y + 63, 14);
+                        if (!isEntranceLeft)
+                        {
+                            isEntranceLeft = true;
+                            await PlaceBlock(1, 30, y + 63, 14);
+                        }
+                        await PlaceBlock(1, 30, y + 64, 14);
+                        await PlaceBlock(1, 31, y + 64, 96);
+                        //await PlaceBlock(1, 32, y + 64, map[1, 0, y].Id);
                     }
-                    await PlaceBlock(1, 30, y + 64, 14);
-                    await PlaceBlock(1, 31, y + 64, 96);
-                    //await PlaceBlock(1, 32, y + 64, map[1, 0, y].Id);
                 }
             }
-
         }
 
         public static async Task CreateExit()
@@ -294,6 +296,8 @@ namespace ShiftBot
         /// </summary>
         public static async Task ContinueGame()
         {
+            isBuilding = true;
+
             if (Tick != null)
                 Tick.Stop();
             if (Eliminator != null)
@@ -306,6 +310,8 @@ namespace ShiftBot
             Thread.Sleep(6000);
             await BuildMap(Maps.ElementAt(new Random().Next(0, Maps.Count)));
             await CreateExit();
+
+            isBuilding = false;
 
             Console.Write("GAME!", Color.IndianRed);
             if (PlayersSafe.Count < 2)

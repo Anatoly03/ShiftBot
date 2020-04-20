@@ -34,6 +34,7 @@ namespace ShiftBot
         public static DateTime startTime = DateTime.Now;
         public static DateTime firstPerson;
         public static int round;
+        public static bool isBuilding;
 
         public static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
@@ -293,8 +294,8 @@ namespace ShiftBot
 
                     if (m.GetString(1).StartsWith("!", StringComparison.Ordinal) || m.GetString(1).StartsWith(".", StringComparison.Ordinal))
                     {
-                        string[] param = m.GetString(1).ToLower().Substring(1).Split(" ", StringSplitOptions.RemoveEmptyEntries);
-                        string cmd = param[0];
+                        string[] param = m.GetString(1).Substring(1).Split(" ", StringSplitOptions.RemoveEmptyEntries);
+                        string cmd = param[0].ToLower();
                         player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
 
                         switch (cmd)
@@ -328,7 +329,7 @@ namespace ShiftBot
                             case "scan":
                                 if (player.IsMod && param.Length > 1)
                                 {
-                                    //await OpenScanner(param[1]);
+                                    await OpenScanner(param[1], player);
                                 }
                                 break;
                         }
@@ -347,7 +348,7 @@ namespace ShiftBot
             if (PlayersSafe.Count > 0)
             {
                 TimeSpan ts = DateTime.Now - startTime;
-                string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
+                //string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
 
                 string display = TimeToString((TimeSpan)(DateTime.Now - startTime));
 

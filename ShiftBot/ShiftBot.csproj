@@ -10,4 +10,10 @@
     <PackageReference Include="EEUniverse" Version="2.0.0" />
     <PackageReference Include="Colorful.Console" Version="1.2.10" />
   </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="..\README.md\EmptyClass.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\README.md" />
+  </ItemGroup>
 </Project>
