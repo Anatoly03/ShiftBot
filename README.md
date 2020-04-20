@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [Game Process](#game-process)
+- [Commands](#moderation)
 
 ## Game Process
 
@@ -42,4 +43,25 @@ The game process is a cycle, consisting of non-changing elements
   - Creating exit (coin doors)
   - Creating the gravity tunnels
   - Opening the entrance (which happens on top of the gravity tunnels)
-- Releasing the players and starting the countdown (to both, closing the doors and recording the players' `startTime`).
+- Releasing the players and starting the countdowns.
+
+### Multi-dependent events
+
+#### Closing the door
+
+The door closes if one of the following conditions is met:
+
+- Half a second after active players' movement detected
+- Five seconds in general passed after players released
+
+#### Ending the game
+
+The game ends if one of the following conditions is met:
+
+- 50% of active players finished.
+- 5-20 seconds after the first player has finished passed.
+- 150 seconds timelimit overdue.
+
+## Moderation
+
+TODO: Add MOD COMMAMDS

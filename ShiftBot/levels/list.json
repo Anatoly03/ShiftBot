@@ -1,1 +1,45 @@
-[{"Id":0,"Title":"First Map","Creator":"anatoly","Difficulty":0},{"Id":1,"Title":"Easter Ortodoux Place","Creator":"edilight2003","Difficulty":2},{"Id":2,"Title":"Black","Creator":"anatoly","Difficulty":2},{"Id":3,"Title":"Untitled Map","Creator":null,"Difficulty":0},{"Id":4,"Title":"Untitled Map","Creator":null,"Difficulty":0},{"Id":5,"Title":"Untitled Map","Creator":null,"Difficulty":0},{"Id":6,"Title":"Untitled Map","Creator":null,"Difficulty":0}]
+[
+
+  {
+    "Id": 0,
+    "Title": "First Map",
+    "Creator": "Anatoly",
+    "Difficulty": 0
+  },
+  {
+    "Id": 1,
+    "Title": "Easter Ortodoux Place",
+    "Creator": "edilight2003",
+    "Difficulty": 2
+  },
+  {
+    "Id": 2,
+    "Title": "Black",
+    "Creator": "Anatoly",
+    "Difficulty": 2
+  },
+  {
+    "Id": 3,
+    "Title": "Gravity Crystals",
+    "Creator": "Anatoly",
+    "Difficulty": 0
+  },
+  {
+    "Id": 4,
+    "Title": "The Underground Temple",
+    "Creator": "Anatoly",
+    "Difficulty": 3
+  },
+  {
+    "Id": 5,
+    "Title": "Cave Chasms",
+    "Creator": "K_Advanced",
+    "Difficulty": 1
+  },
+  {
+    "Id": 6,
+    "Title": "Sunny Day",
+    "Creator": "Edilight2003",
+    "Difficulty": 3
+  }
+]

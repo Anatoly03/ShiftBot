@@ -35,6 +35,7 @@ namespace ShiftBot
         public static DateTime firstPerson;
         public static int round;
         public static bool isBuilding;
+        public static bool isDoorOpen;
 
         public static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
@@ -53,6 +54,7 @@ namespace ShiftBot
          * 1 - basic_easy
          * 2 - easy
          * 3 - easy_medium
+         * 4 - medium
          */
 
         /*
@@ -190,6 +192,7 @@ namespace ShiftBot
                     Players.Add(new Player(m.GetInt(0), m.GetString(1).ToLower()));
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
 
+                    Console.Write("+ ", Color.Green);
                     if (player.IsMod)
                     {
                         Console.Write(player.Name, Color.Orange);
@@ -208,6 +211,7 @@ namespace ShiftBot
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
                     Players.RemoveAll(p => p.Id == m.GetInt(0));
 
+                    Console.Write("- ", Color.Red);
                     if (player.IsMod)
                     {
                         Console.Write(player.Name, Color.Orange);
@@ -226,17 +230,22 @@ namespace ShiftBot
 
                 case MessageType.PlayerMove:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
+                    var playerInGame = PlayersInGame.FirstOrDefault(p => p.Id == m.GetInt(0));
 
                     {
-
                         int x = (int) Math.Floor(m.GetDouble(5));
                         int y = (int) Math.Floor(m.GetDouble(6));
 
-
-                        /*if (!player.afk)
+                        if (playerInGame != null)
                         {
-
-                        }*/
+                            if (x > 32 && x < 74 && y > 65 && y < 84)
+                            {
+                                if (isDoorOpen)
+                                {
+                                    EntranceMovement.Start();
+                                }
+                            }
+                        }
                     }
 
                     break;
@@ -322,7 +331,10 @@ namespace ShiftBot
                             case "start":
                                 if (player.IsMod)
                                 {
-                                    await ContinueGame();
+                                    await Task.Run(async () =>
+                                    {
+                                        await ContinueGame();
+                                    });
                                 }
                                 break;
 
