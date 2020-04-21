@@ -301,103 +301,106 @@ namespace ShiftBot
         /// </summary>
         public static async Task ContinueGame()
         {
-            isBuilding = true;
-
-            if (Tick != null)
-                Tick.Stop();
-            if (Eliminator != null)
-                Eliminator.Stop();
-            if (TimeLimit != null)
-                TimeLimit.Stop();
-
-            await ClearGameArea();
-
-            Thread.Sleep(6000);
-
-            MapInfo newMap = Maps.ElementAt(new Random().Next(0, Maps.Count));
-            await BuildMap(newMap);
-            await CreateExit();
-            isBuilding = false;
-
+            if (!isBuilding)
             {
-                Formatter[] format =
+                isBuilding = true;
+
+                if (Tick != null)
+                    Tick.Stop();
+                if (Eliminator != null)
+                    Eliminator.Stop();
+                if (TimeLimit != null)
+                    TimeLimit.Stop();
+
+                await ClearGameArea();
+
+                Thread.Sleep(6000);
+
+                MapInfo newMap = Maps.ElementAt(new Random().Next(0, Maps.Count));
+                await BuildMap(newMap);
+                await CreateExit();
+
                 {
+                    Formatter[] format =
+                    {
                     new Formatter(newMap.Title, Color.Cyan),
                     new Formatter(newMap.Id.ToString(), Color.Gray),
                     new Formatter(newMap.Creator, Color.Cyan),
                 };
 
-                Console.WriteLineFormatted("  Map {0} ({1}) By {2}", Color.Silver, format);
-            }
-
-
-            if (PlayersSafe.Count < 2)
-            {
-                round = 1;
-
-                PlayersInGame = new List<Player>();
-                PlayersSafe = new Dictionary<Player, TimeSpan>();
-
-                foreach (Player p in Players)
-                {
-                    await SayCommand($"reset {p.Name}");
-                    await SayCommand($"tp {p.Name} 47 86");
-                    PlayersInGame.Add(p);
+                    Console.WriteLineFormatted("  Map {0} ({1}) By {2}", Color.Silver, format);
                 }
 
-                Console.Write("* ", Color.Silver);
-                Console.Write("NEW GAME! ");
-                Console.WriteLine($"{Players.Count} in world, {PlayersInGame.Count} joined", Color.DarkGray);
-            }
-            else
-            {
-                round++;
 
-                int playersBefore = PlayersInGame.Count;
-                PlayersInGame = new List<Player>();
-
-                foreach (KeyValuePair<Player, TimeSpan> p in PlayersSafe)
+                if (PlayersSafe.Count < 2)
                 {
-                    PlayersInGame.Add(p.Key);
+                    round = 1;
+
+                    PlayersInGame = new List<Player>();
+                    PlayersSafe = new Dictionary<Player, TimeSpan>();
+
+                    foreach (Player p in Players)
+                    {
+                        await SayCommand($"reset {p.Name}");
+                        await SayCommand($"tp {p.Name} 47 86");
+                        PlayersInGame.Add(p);
+                    }
+
+                    Console.Write("* ", Color.Silver);
+                    Console.Write("NEW GAME! ");
+                    Console.WriteLine($"{Players.Count} in world, {PlayersInGame.Count} joined", Color.DarkGray);
                 }
-
-                PlayersSafe = new Dictionary<Player, TimeSpan>();
-
-                Formatter[] format =
+                else
                 {
+                    round++;
+
+                    int playersBefore = PlayersInGame.Count;
+                    PlayersInGame = new List<Player>();
+
+                    foreach (KeyValuePair<Player, TimeSpan> p in PlayersSafe)
+                    {
+                        PlayersInGame.Add(p.Key);
+                    }
+
+                    PlayersSafe = new Dictionary<Player, TimeSpan>();
+
+                    Formatter[] format =
+                    {
                     new Formatter("Round", Color.White),
                     new Formatter(round, Color.Gold),
                     new Formatter(PlayersInGame.Count, Color.Green),
                     new Formatter(playersBefore - PlayersInGame.Count, Color.Green),
                 };
 
-                Console.WriteLineFormatted("    {0} {1}! {2} joined the round, {3} eliminated", Color.Silver, format);
+                    Console.WriteLineFormatted("    {0} {1}! {2} joined the round, {3} eliminated", Color.Silver, format);
+                }
+
+                TimeLimit = new System.Timers.Timer(150 * 1000);
+                TimeLimit.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                    await Say($"Time's over!");
+                    await ContinueGame();
+                };
+
+                int k = 20 * 1000;
+                //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+                Eliminator = new System.Timers.Timer(k);
+                Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                    await ContinueGame();
+                };
+
+                Thread.Sleep(5000);
+                await MakeGravity();
+                await OpenEntrance();
+                Thread.Sleep(500);
+                await ReleasePlayers();
+                startTime = DateTime.Now;
+                TimeLimit.Start();
+
+                Thread.Sleep(2000);
+                await CreateSafeArea();
+                Tick.Start();
+                isBuilding = false;
             }
-
-            TimeLimit = new System.Timers.Timer(150 * 1000);
-            TimeLimit.Elapsed += async (Object s, ElapsedEventArgs e) => {
-                await Say($"Time over!");
-                await ContinueGame();
-            };
-
-            int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-            Eliminator = new System.Timers.Timer(k);
-            Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
-                await ContinueGame();
-            };
-
-            Thread.Sleep(2000);
-            await MakeGravity();
-            await OpenEntrance();
-
-            Thread.Sleep(2000);
-            await ReleasePlayers();
-            startTime = DateTime.Now;
-            TimeLimit.Start();
-
-            Thread.Sleep(2000);
-            await CreateSafeArea();
-            Tick.Start();
         }
 
         /// <summary>
@@ -411,8 +414,9 @@ namespace ShiftBot
             {
                 firstPerson = DateTime.Now;
 
-                int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                string s = $"{k} seconds left!";
+                int k = 20;
+                //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+                string s = $"Less than {k} seconds left!";
                 await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
                 Eliminator.Start();
             }
@@ -439,6 +443,8 @@ namespace ShiftBot
 
             if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
             {
+                if (PlayersSafe.Count > 1)
+                await Say($"Round over! Players not finished are eliminated!");
                 await ContinueGame();
             }
         }
