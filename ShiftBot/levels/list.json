@@ -1,5 +1,4 @@
 [
-
   {
     "Id": 0,
     "Title": "First Map",
@@ -9,7 +8,7 @@
   {
     "Id": 1,
     "Title": "Easter Ortodoux Place",
-    "Creator": "edilight2003",
+    "Creator": "Edilight2003",
     "Difficulty": 2
   },
   {
@@ -41,5 +40,29 @@
     "Title": "Sunny Day",
     "Creator": "Edilight2003",
     "Difficulty": 3
+  },
+  {
+    "Id": 7,
+    "Title": "MOCHIO IF YOU SEE THIS CONTACT ME TO NAME YOUR MAP",
+    "Creator": "Mochio",
+    "Difficulty": 0
+  },
+  {
+    "Id": 8,
+    "Title": "Dread and Roses",
+    "Creator": "K-Advanced",
+    "Difficulty": 0
+  },
+  {
+    "Id": 9,
+    "Title": "A trip through chaos",
+    "Creator": "LeoGiaco",
+    "Difficulty": 0
+  },
+  {
+    "Id": 10,
+    "Title": "Temple of Legends",
+    "Creator": "Anatoly",
+    "Difficulty": 0
   }
 ]
