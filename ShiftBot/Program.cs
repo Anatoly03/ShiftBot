@@ -26,6 +26,12 @@ namespace ShiftBot
         public static Dictionary<Player, TimeSpan> PlayersSafe = new Dictionary<Player, TimeSpan>();
         public static List<MapInfo> Maps;
         public static MapInfo currentMap;
+        public static List<MapVote> MapVoteSigns = new List<MapVote> {
+            new MapVote(0, 44, 90),
+            new MapVote(1, 46, 90),
+            new MapVote(2, 53, 90),
+            new MapVote(3, 55, 90),
+        };
 
         public static int Width;
         public static int Height;
@@ -38,7 +44,7 @@ namespace ShiftBot
         public static bool isDoorOpen;
 
         public static System.Timers.Timer Tick;
-        public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto };
+        public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented };
 
         // Control Timers
         public static System.Timers.Timer EntranceCooldown;
@@ -184,6 +190,8 @@ namespace ShiftBot
                     Tick = new System.Timers.Timer(50);
                     Tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
 
+                    await RegenerateMapVoters();
+
                     break;
 
                 case MessageType.PlayerJoin:
@@ -225,27 +233,32 @@ namespace ShiftBot
 
                 case MessageType.PlayerGod:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
-                    player.afk = m.GetBool(1);
+                    player.Afk = m.GetBool(1);
                     break;
-
+                    
                 case MessageType.PlayerMove:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
                     var playerInGame = PlayersInGame.FirstOrDefault(p => p.Id == m.GetInt(0));
 
                     {
-                        int x = (int) Math.Floor(m.GetDouble(5));
-                        int y = (int) Math.Floor(m.GetDouble(6));
+                        int facex = m.GetInt(3);
+                        int facey = m.GetInt(4);
+
+                        double x = m.GetDouble(5);
+                        double y = m.GetDouble(6);
 
                         if (playerInGame != null)
-                        {
                             if (x > 32 && x < 74 && y > 65 && y < 84)
-                            {
                                 if (isDoorOpen)
-                                {
                                     EntranceMovement.Start();
-                                }
-                            }
-                        }
+
+                        if (!player.Afk)
+                            if (!isBuilding)
+                                foreach (MapVote mv in MapVoteSigns)
+                                    if (mv.Inited)
+                                        if (Math.Pow(x - mv.X, 2) + Math.Pow(y - mv.Y, 2) < 0.5)
+                                            if (facey == -1)
+                                                await mv.NewVote(player);
                     }
 
                     break;
@@ -313,11 +326,15 @@ namespace ShiftBot
                                 await SayPrivate(player, "Pong!");
                                 break;
 
-                            case "clear":
-                                if (player.IsMod)
-                                {
-                                    await ClearGameArea();
-                                }
+                            case "wins":
+                                await SayPrivate(player, "You have 0 wins!");
+                                break;
+
+                            case "aminub":
+                            case "aminoob":
+                            case "amineeb":
+                            case "aminewb":
+                                await SayPrivate(player, "Yes, you're a noob!");
                                 break;
 
                             case "save":

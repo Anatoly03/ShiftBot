@@ -12,12 +12,14 @@ namespace ShiftBot
         public int Id { get; set; }
         public string Name { get; set; }
         public bool IsMod { get; set; }
-        public bool afk { get; set; }
+        public bool Afk { get; set; }
+        public int Vote { get; set; }
 
         public Player(int _id, string _name)
         {
             Id = _id;
             Name = _name;
+            Vote = -1;
 
             if (Program.Profiles.ContainsKey(Name))
             {

@@ -295,6 +295,39 @@ namespace ShiftBot
             await PlaceBlock(1, 53, 86, 96);
         }
 
+        public static async Task RegenerateMapVoters()
+        {
+            var buffer = new List<MapInfo>();
+            var r = new Random();
+
+            foreach (MapInfo k in Maps)
+            {
+                if (currentMap != null)
+                {
+                    if (k.Id != currentMap.Id)
+                        buffer.Insert(r.Next(0, buffer.Count), k);
+                }
+                else
+                {
+                    buffer.Insert(r.Next(0, buffer.Count), k);
+                }
+            }
+
+            foreach (MapVote mv in MapVoteSigns)
+            {
+                await mv.SetMap(buffer.ElementAt(0));
+                buffer.RemoveAt(0);
+            }
+        }
+
+        public static async Task HideMapVoters()
+        {
+            foreach (MapVote mv in MapVoteSigns)
+            {
+                mv.Close();
+            }
+        }
+
 
         /// <summary>
         /// Start or continue a running game process
@@ -312,11 +345,36 @@ namespace ShiftBot
                 if (TimeLimit != null)
                     TimeLimit.Stop();
 
+                await HideMapVoters();
                 await ClearGameArea();
 
                 Thread.Sleep(6000);
 
-                MapInfo newMap = Maps.ElementAt(new Random().Next(0, Maps.Count));
+                int maxVotes = 0;
+                var chose = new List<MapInfo>();
+                foreach (MapVote mv in MapVoteSigns)
+                {
+                    if (maxVotes < mv.Votes)
+                    {
+                        maxVotes = mv.Votes;
+                        chose.Clear();
+                        chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
+                    }
+                    else if (maxVotes == mv.Votes)
+                    {
+                        chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
+                    }
+                }
+
+                MapInfo newMap = Maps.ElementAt(0);
+                if (chose.Count == 1)
+                {
+                    newMap = chose.ElementAt(0);
+                }
+                else if (chose.Count > 1)
+                {
+                    newMap = chose.ElementAt(new Random().Next(0, chose.Count));
+                }
                 await BuildMap(newMap);
                 await CreateExit();
 
@@ -398,6 +456,7 @@ namespace ShiftBot
 
                 Thread.Sleep(2000);
                 await CreateSafeArea();
+                await RegenerateMapVoters();
                 Tick.Start();
                 isBuilding = false;
             }
@@ -410,19 +469,19 @@ namespace ShiftBot
         {
             TimeSpan ts = DateTime.Now - startTime;
 
-            if (PlayersSafe.Count == 0) // First
+            if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null && !isBuilding)
             {
-                firstPerson = DateTime.Now;
+                if (PlayersSafe.Count == 0) // First
+                {
+                    firstPerson = DateTime.Now;
 
-                int k = 20;
-                //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                string s = $"Less than {k} seconds left!";
-                await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
-                Eliminator.Start();
-            }
+                    int k = 20;
+                    //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+                    string s = $"   {k} seconds left!";
+                    await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
+                    Eliminator.Start();
+                }
 
-            if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
-            {
                 string elapsedTime = TimeToString(ts);
                 PlayersSafe.Add(player, ts);
 
@@ -439,13 +498,13 @@ namespace ShiftBot
                     new Formatter(elapsedTime, Color.Green),
                 };
                 Console.WriteLineFormatted("    {0}. {1} in {2}", Color.Silver, format);
-            }
 
-            if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
-            {
-                if (PlayersSafe.Count > 1)
-                await Say($"Round over! Players not finished are eliminated!");
-                await ContinueGame();
+                if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
+                {
+                    if (PlayersSafe.Count > 1)
+                        await Say($"Round over! Players not finished are eliminated!");
+                    await ContinueGame();
+                }
             }
         }
     }
