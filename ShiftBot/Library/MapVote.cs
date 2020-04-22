@@ -29,9 +29,11 @@ namespace ShiftBot
             await Program.PlaceSign(X, Y, 55, $"{m.Title}\nBy {m.Creator}", 1);
         }
 
-        public void Close()
+        public async Task Close()
         {
             Inited = false;
+            MapInfo m = Program.Maps.FirstOrDefault(map => map.Id == MapId);
+            await Program.PlaceSign(X, Y, 58, $"{m.Title}\nBy {m.Creator}\n\n[{Votes} votes]\nVoting closed", 1);
         }
 
         /// <summary>

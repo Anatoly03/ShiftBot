@@ -130,68 +130,68 @@ namespace ShiftBot
             switch (m.Type)
             {
                 case MessageType.Init:
+                    {
+                        Console.WriteLine("Logged in!");
+                        Console.WriteLine();
+                        await Say($"Connected!");
 
-                    Console.WriteLine("Logged in!");
-                    Console.WriteLine();
-                    await Say($"Connected!");
+                        World = new Block[2, m.GetInt(9), m.GetInt(10)];
 
-                    World = new Block[2, m.GetInt(9), m.GetInt(10)];
+                        Width = m.GetInt(9);
+                        Height = m.GetInt(10);
+                        BotId = m.GetInt(0);
 
-                    Width = m.GetInt(9);
-                    Height = m.GetInt(10);
-                    BotId = m.GetInt(0);
-
-                    int index = 11;
-                    for (int y = 0; y < Width; y++)
-                        for (int x = 0; x < Height; x++)
-                        {
-                            int value = 0;
-                            if (m[index++] is int iValue)
-                                value = iValue;
-
-                            var backgroundId = value >> 16;
-                            var foregroundId = 65535 & value;
-
-                            World[1, x, y] = new Block(foregroundId);
-                            World[0, x, y] = new Block(backgroundId);
-                            switch (foregroundId)
+                        int index = 11;
+                        for (int _y = 0; _y < Width; _y++)
+                            for (int _x = 0; _x < Height; _x++)
                             {
-                                case 55:
-                                case 56:
-                                case 57:
-                                case 58:
-                                    string text = m.GetString(index++);
-                                    int morph = m.GetInt(index++);
-                                    World[1, x, y] = new Sign(foregroundId, text, morph);
-                                    break;
+                                int value = 0;
+                                if (m[index++] is int iValue)
+                                    value = iValue;
 
-                                case 59:
-                                    int rotation = m.GetInt(index++);
-                                    int p_id = m.GetInt(index++);
-                                    int t_id = m.GetInt(index++);
-                                    bool flip = m.GetBool(index++);
-                                    World[1, x, y] = new Portal(foregroundId, rotation, p_id, t_id, flip);
-                                    break;
+                                var backgroundId = value >> 16;
+                                var foregroundId = 65535 & value;
 
-                                case 93:
-                                case 94:
-                                    int r = m.GetInt(index++);
-                                    World[1, x, y] = new Effect(foregroundId, r);
-                                    break;
+                                World[1, _x, _y] = new Block(foregroundId);
+                                World[0, _x, _y] = new Block(backgroundId);
+                                switch (foregroundId)
+                                {
+                                    case 55:
+                                    case 56:
+                                    case 57:
+                                    case 58:
+                                        string text = m.GetString(index++);
+                                        int morph = m.GetInt(index++);
+                                        World[1, _x, _y] = new Sign(foregroundId, text, morph);
+                                        break;
+
+                                    case 59:
+                                        int rotation = m.GetInt(index++);
+                                        int p_id = m.GetInt(index++);
+                                        int t_id = m.GetInt(index++);
+                                        bool flip = m.GetBool(index++);
+                                        World[1, _x, _y] = new Portal(foregroundId, rotation, p_id, t_id, flip);
+                                        break;
+
+                                    case 93:
+                                    case 94:
+                                        int r = m.GetInt(index++);
+                                        World[1, _x, _y] = new Effect(foregroundId, r);
+                                        break;
+                                }
                             }
-                        }
 
-                    /*for (int x = 0; x < Width; x++)
-                        for (int y = 0; y < Height; y++)
-                            if (World[1, x, y].Id == 20)
-                                //await PlaceBlock(1, x, y, 80);*/
+                        /*for (int x = 0; x < Width; x++)
+                            for (int y = 0; y < Height; y++)
+                                if (World[1, x, y].Id == 20)
+                                    //await PlaceBlock(1, x, y, 80);*/
 
-                    startTime = DateTime.Now;
-                    Tick = new System.Timers.Timer(50);
-                    Tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
+                        startTime = DateTime.Now;
+                        Tick = new System.Timers.Timer(50);
+                        Tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
 
-                    await RegenerateMapVoters();
-
+                        await RegenerateMapVoters();
+                    }
                     break;
 
                 case MessageType.PlayerJoin:
@@ -210,7 +210,7 @@ namespace ShiftBot
                     {
                         Console.Write(player.Name, Color.Silver);
                     }
-                    Console.WriteLine(" joined!");
+                    Console.WriteLine($" joined! ({new Random(player.Name.GetHashCode()).Next(0, 101)}% noob)");
 
                     break;
 
@@ -244,11 +244,11 @@ namespace ShiftBot
                         int facex = m.GetInt(3);
                         int facey = m.GetInt(4);
 
-                        double x = m.GetDouble(5);
-                        double y = m.GetDouble(6);
+                        double mx = m.GetDouble(5);
+                        double my = m.GetDouble(6);
 
                         if (playerInGame != null)
-                            if (x > 32 && x < 74 && y > 65 && y < 84)
+                            if (mx > 32 && mx < 74 && my > 65 && my < 84)
                                 if (isDoorOpen)
                                     EntranceMovement.Start();
 
@@ -256,7 +256,7 @@ namespace ShiftBot
                             if (!isBuilding)
                                 foreach (MapVote mv in MapVoteSigns)
                                     if (mv.Inited)
-                                        if (Math.Pow(x - mv.X, 2) + Math.Pow(y - mv.Y, 2) < 0.5)
+                                        if (Math.Pow(mx - mv.X, 2) + Math.Pow(my - mv.Y, 2) < 0.5)
                                             if (facey == -1)
                                                 await mv.NewVote(player);
                     }
@@ -268,47 +268,42 @@ namespace ShiftBot
                     break;
 
                 case MessageType.PlaceBlock:
-                    if (m.GetInt(0) != BotId)
+                    int l = m.GetInt(1);
+                    int x = m.GetInt(2);
+                    int y = m.GetInt(3);
+
+                    Block blockBefore = World[l, x, y];
+
+                    // Assign block to the world
+                    World[l, x, y] = new Block(m.GetInt(4));
+
+                    switch (m.GetInt(4))
                     {
-                        //Console.WriteLine(m);
+                        // Signs
+                        case 55:
+                        case 56:
+                        case 57:
+                        case 58:
+                            string text = m.GetString(5);
+                            int morph = m.GetInt(6);
+                            World[l, x, y] = new Sign(m.GetInt(4), text, morph);
+                            break;
 
-                        int l = m.GetInt(1);
-                        int x = m.GetInt(2);
-                        int y = m.GetInt(3);
+                        // Portals
+                        case 59:
+                            int rotation = m.GetInt(5);
+                            int p_id = m.GetInt(6);
+                            int t_id = m.GetInt(7);
+                            bool flip = m.GetBool(8);
+                            World[l, x, y] = new Portal(m.GetInt(4), rotation, p_id, t_id, flip);
+                            break;
 
-                        Block blockBefore = World[l, x, y];
-
-                        // Assign block to the world
-                        World[l, x, y] = new Block(m.GetInt(4));
-
-                        switch (m.GetInt(4))
-                        {
-                            // Signs
-                            case 55:
-                            case 56:
-                            case 57:
-                            case 58:
-                                string text = m.GetString(5);
-                                int morph = m.GetInt(6);
-                                World[l, x, y] = new Sign(m.GetInt(4), text, morph);
-                                break;
-
-                            // Portals
-                            case 59:
-                                int rotation = m.GetInt(5);
-                                int p_id = m.GetInt(6);
-                                int t_id = m.GetInt(7);
-                                bool flip = m.GetBool(8);
-                                World[l, x, y] = new Portal(m.GetInt(4), rotation, p_id, t_id, flip);
-                                break;
-
-                            // Effects
-                            case 93:
-                            case 94:
-                                int r = m.GetInt(5);
-                                World[l, x, y] = new Effect(m.GetInt(4), r);
-                                break;
-                        }
+                        // Effects
+                        case 93:
+                        case 94:
+                            int r = m.GetInt(5);
+                            World[l, x, y] = new Effect(m.GetInt(4), r);
+                            break;
                     }
                     break;
 
@@ -326,21 +321,63 @@ namespace ShiftBot
                                 await SayPrivate(player, "Pong!");
                                 break;
 
-                            case "wins":
-                                await SayPrivate(player, "You have 0 wins!");
+                            case "help":
+                                if (player.IsMod)
+                                {
+                                    await SayPrivate(player, ".fullname, .name - set the world name to.. (.name renames the prefix)");
+                                    await SayPrivate(player, ".scan worldid - opens a scanner in a new world");
+                                    await SayPrivate(player, ".kill, .start - continue the game process (eliminate players or start game)");
+                                }
+                                await SayPrivate(player, ".aminoob - shows your noob percentage");
+                                await SayPrivate(player, ".stats, .s - shows your player staticstics");
+                                break;
+
+                            case "stats":
+                            case "s":
+                                await SayPrivate(player, "You have 0 wins, 0 players, .. stats basically");
                                 break;
 
                             case "aminub":
                             case "aminoob":
+                            case "amin00b":
                             case "amineeb":
                             case "aminewb":
-                                await SayPrivate(player, "Yes, you're a noob!");
+                                {
+                                    int i = new Random(player.Name.GetHashCode()).Next(0, 101);
+                                    await SayPrivate(player, $"You're a noob with a probability of {i}%");
+                                }
                                 break;
 
-                            case "save":
+                            case "build":
+                                if (player.IsMod && param.Length > 1)
+                                {
+                                    try
+                                    {
+                                        await BuildMap(int.Parse(param[1]));
+                                        await OpenEntrance();
+                                        Thread.Sleep(1000);
+                                        await CloseEntrance();
+                                    }
+                                    catch
+                                    {
+                                        await SayPrivate(player, $"Error! Either there is no map with that id, or this is not an integer.");
+                                    }
+                                }
+                                break;
+
+                            case "fullname":
                                 if (player.IsMod)
                                 {
-                                    await SaveMap();
+                                    string title = m.GetString(1).Substring(2 + cmd.Length);
+                                    await SayCommand($"title {title}");
+                                }
+                                break;
+
+                            case "name":
+                                if (player.IsMod)
+                                {
+                                    string title = m.GetString(1).Substring(2 + cmd.Length);
+                                    await SayCommand($"title {title}: CC Shift");
                                 }
                                 break;
 

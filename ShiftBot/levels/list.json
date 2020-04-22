@@ -43,26 +43,32 @@
   },
   {
     "Id": 7,
-    "Title": "MOCHIO IF YOU SEE THIS CONTACT ME TO NAME YOUR MAP",
+    "Title": "Mochio's First Map",
     "Creator": "Mochio",
-    "Difficulty": 0
+    "Difficulty": 2
   },
   {
     "Id": 8,
     "Title": "Dread and Roses",
     "Creator": "K-Advanced",
-    "Difficulty": 0
+    "Difficulty": 1
   },
   {
     "Id": 9,
     "Title": "A trip through chaos",
     "Creator": "LeoGiaco",
+    "Difficulty": 3
+  },
+  {
+    "Id": 11,
+    "Title": "Temple of Legends",
+    "Creator": "Anatoly",
     "Difficulty": 0
   },
   {
-    "Id": 10,
-    "Title": "Temple of Legends",
-    "Creator": "Anatoly",
+    "Id": 12,
+    "Title": "Gravity Binder I",
+    "Creator": "K_Advanced",
     "Difficulty": 0
   }
 ]

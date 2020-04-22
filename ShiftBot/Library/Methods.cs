@@ -148,12 +148,11 @@ namespace ShiftBot
 
             while (buffer.Count > 0)
             {
-
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
                     Thread.Sleep(5);
-                    await PlaceBlock(pair.Key.L, pair.Key.X, pair.Key.Y, pair.Value.Id);
+                    await pair.Value.Place(pair.Key.L, pair.Key.X, pair.Key.Y);
                 }
                 buffer.Remove(pair.Key);
             }
@@ -179,7 +178,7 @@ namespace ShiftBot
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
-                    Thread.Sleep(10);
+                    Thread.Sleep(15);
                     await PlaceBlock(pair.Key.L, pair.Key.X, pair.Key.Y, pair.Value.Id);
                 }
                 buffer.Remove(pair.Key);
@@ -192,8 +191,11 @@ namespace ShiftBot
 
             // Where is the entrance?
             bool isEntranceLeft = false;
-            //bool isEntranceRight = false;
+            bool isEntranceTop = false;
+            bool isEntranceRight = false;
+            bool isEntranceBottom = false;
 
+            // Left?
             for (int y = 0; y < 22; y++)
             {
                 if (map[1, 0, y].Id == 16)
@@ -210,8 +212,62 @@ namespace ShiftBot
                 }
             }
 
+            // Top?
+            if (!isEntranceLeft)
+                for (int x = 37; x > -1; x--)
+                {
+                    if (map[1, x,0].Id == 16)
+                    {
+                        if (!isEntranceTop)
+                        {
+                            isEntranceTop = true;
+                            await PlaceBlock(1, x + 32, 63, 96);
+                        }
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await PlaceBlock(1, x + 31, 63 + i, 0);
+                        }
+                    }
+                }
+
+            // Right?
+            if (!isEntranceLeft && !isEntranceTop)
+                for (int y = 21; y > -1; y--)
+                {
+                    if (map[1, 37, y].Id == 16)
+                    {
+                        if (!isEntranceRight)
+                        {
+                            isEntranceRight = true;
+                            await PlaceBlock(1, 69, y + 65, 96);
+                        }
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await PlaceBlock(1, 67 + i, y + 64, 13);
+                        }
+                    }
+                }
+
+            // Bottom?
+            if (!isEntranceLeft && !isEntranceTop && !isEntranceRight)
+                for (int x = 0; x < 38; x++)
+                {
+                    if (map[1, x, 21].Id == 16)
+                    {
+                        if (!isEntranceBottom)
+                        {
+                            isEntranceBottom = true;
+                            await PlaceBlock(1, x + 31, 86, 96);
+                        }
+                        for (int i = 0; i < 3; i++)
+                        {
+                            await PlaceBlock(1, x + 31, 86 - i, 14);
+                        }
+                    }
+                }
+
             // Prepare countdown to close the door.
-            EntranceCooldown = new System.Timers.Timer(5000);
+            EntranceCooldown = new System.Timers.Timer(10000);
             EntranceCooldown.Elapsed += async (Object s, ElapsedEventArgs e) => {
                 await CloseEntrance();
                 EntranceCooldown.Stop();
@@ -234,8 +290,11 @@ namespace ShiftBot
 
                 // Where is the entrance?
                 bool isEntranceLeft = false;
-                //bool isEntranceRight = false;
+                bool isEntranceTop = false;
+                bool isEntranceRight = false;
+                bool isEntranceBottom = false;
 
+                // Left?
                 for (int y = 0; y < 22; y++)
                 {
                     if (map[1, 0, y].Id == 16)
@@ -247,9 +306,61 @@ namespace ShiftBot
                         }
                         await PlaceBlock(1, 30, y + 64, 14);
                         await PlaceBlock(1, 31, y + 64, 96);
-                        await PlaceBlock(1, 32, y + 64, map[1, 1, y].Id);
+                        await map[1, 36, y].Place(1, 32, y + 64);
                     }
                 }
+
+                // Top?
+                if (!isEntranceLeft)
+                    for (int x = 37; x > -1; x--)
+                    {
+                        if (map[1, x, 0].Id == 16)
+                        {
+                            if (!isEntranceTop)
+                            {
+                                isEntranceTop = true;
+                                await PlaceBlock(1, x + 32, 63, 15);
+                            }
+                            await PlaceBlock(1, x + 31, 63, 15);
+                            await PlaceBlock(1, x + 31, 64, 96);
+                            await PlaceBlock(1, x + 31, 64, 96);
+                            await map[1, x, 0].Place(1, x + 31, 65);
+                        }
+                    }
+
+                // Right?
+                if (!isEntranceLeft && !isEntranceTop)
+                    for (int y = 21; y > -1; y--)
+                    {
+                        if (map[1, 37, y].Id == 16)
+                        {
+                            if (!isEntranceRight)
+                            {
+                                isEntranceRight = true;
+                                await PlaceBlock(1, 69, y + 65, 0);
+                            }
+                            await map[1, 36, y].Place(1, 67, y + 64);
+                            await PlaceBlock(1, 68, y + 64, 96);
+                            await PlaceBlock(1, 69, y + 64, 0);
+                        }
+                    }
+
+                // Bottom?
+                if (!isEntranceLeft && !isEntranceTop && !isEntranceRight)
+                    for (int x = 0; x < 38; x++)
+                    {
+                        if (map[1, x, 21].Id == 16)
+                        {
+                            if (!isEntranceBottom)
+                            {
+                                isEntranceBottom = true;
+                                await PlaceBlock(1, x + 31, 86, 96);
+                            }
+                            await PlaceBlock(1, x + 31, 86, 13);
+                            await PlaceBlock(1, x + 31, 85, 96);
+                            await map[1, x, 20].Place(1, x + 31, 84);
+                        }
+                    }
             }
 
             isDoorOpen = false;
@@ -324,7 +435,7 @@ namespace ShiftBot
         {
             foreach (MapVote mv in MapVoteSigns)
             {
-                mv.Close();
+                await mv.Close();
             }
         }
 
@@ -456,6 +567,7 @@ namespace ShiftBot
 
                 Thread.Sleep(2000);
                 await CreateSafeArea();
+                foreach (Player p in Players) p.Vote = -1;
                 await RegenerateMapVoters();
                 Tick.Start();
                 isBuilding = false;
@@ -477,7 +589,7 @@ namespace ShiftBot
 
                     int k = 20;
                     //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                    string s = $"   {k} seconds left!";
+                    string s = $"{k} seconds left!";
                     await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
                     Eliminator.Start();
                 }
