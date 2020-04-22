@@ -57,6 +57,9 @@ namespace ShiftBot
          * General methods
          */
 
+        /// <summary>
+        /// Eliminates players
+        /// </summary>
         public static async Task ClearGameArea()
         {
             var buffer = new Dictionary<LCoordinate, Block>();
@@ -88,48 +91,17 @@ namespace ShiftBot
             await PlaceBlock(1, 47, 86, 13);
         }
 
-        public static async Task SaveMap()
-        {
-            Block[,,] game = new Block[2, 38, 22];
-
-            for (int l = 0; l < 2; l++)
-                for (int x = 31; x < 69; x++)
-                    for (int y = 64; y < 86; y++)
-                        game[l, x - 31, y - 64] = World[l, x, y];
-
-            int n = 0;
-            foreach (MapInfo k in Maps)
-                n = Math.Max(n, k.Id);
-            n++;
-
-            Directory.CreateDirectory($"../../../levels/{n}");
-
-            using (StreamWriter file = File.CreateText($"../../../levels/{n}/map.json"))
-            {
-                var serializer = JsonConvert.SerializeObject(game, Json_settings);
-                file.WriteLine(serializer);
-            }
-
-            Maps.Add(new MapInfo
-            {
-                Id = n,
-                Title = "Untitled Map"
-            });
-
-            using (StreamWriter file = File.CreateText($"../../../levels/list.json"))
-            {
-                var serializer = JsonConvert.SerializeObject(Maps, Json_settings);
-                file.WriteLine(serializer);
-            }
-
-            await Say("Map saved!");
-        }
-
+        /// <summary>
+        /// Builds a map by id
+        /// </summary>
         public static async Task BuildMap(int id)
         {
             await BuildMap(Maps.FirstOrDefault(m => m.Id == id));
         }
 
+        /// <summary>
+        /// Builds a map by MapInfo
+        /// </summary>
         public static async Task BuildMap(MapInfo info)
         {
             var buffer = new Dictionary<LCoordinate, Block>();
@@ -158,6 +130,9 @@ namespace ShiftBot
             }
         }
 
+        /// <summary>
+        /// Creates the gravity tunnels
+        /// </summary>
         public static async Task MakeGravity()
         {
             var buffer = new Dictionary<LCoordinate, Block>();
@@ -185,6 +160,9 @@ namespace ShiftBot
             }
         }
 
+        /// <summary>
+        /// Creates the entrances of the current map
+        /// </summary>
         public static async Task OpenEntrance()
         {
             var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
@@ -282,6 +260,9 @@ namespace ShiftBot
             isDoorOpen = true;
         }
 
+        /// <summary>
+        /// Closes the entrances of the current map
+        /// </summary>
         public static async Task CloseEntrance()
         {
             if (!isBuilding)
@@ -366,6 +347,9 @@ namespace ShiftBot
             isDoorOpen = false;
         }
 
+        /// <summary>
+        /// Creates coin door exits in the current map
+        /// </summary>
         public static async Task CreateExit()
         {
             var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
@@ -388,12 +372,18 @@ namespace ShiftBot
 
         }
 
+        /// <summary>
+        /// Open the safe area, to release the players.
+        /// </summary>
         public static async Task ReleasePlayers()
         {
             await PlaceBlock(1, 46, 86, 13);
             EntranceCooldown.Start();
         }
 
+        /// <summary>
+        /// Generates a new safe area
+        /// </summary>
         public static async Task CreateSafeArea()
         {
             await PlaceBlock(1, 46, 86, 96);
@@ -401,11 +391,17 @@ namespace ShiftBot
             await PlaceBlock(1, 49, 86, 70);
         }
 
+        /// <summary>
+        /// Closes the safe area
+        /// </summary>
         public static async Task CloseSafeArea()
         {
             await PlaceBlock(1, 53, 86, 96);
         }
 
+        /// <summary>
+        /// Generates new maps to vote on
+        /// </summary>
         public static async Task RegenerateMapVoters()
         {
             var buffer = new List<MapInfo>();
@@ -431,6 +427,9 @@ namespace ShiftBot
             }
         }
 
+        /// <summary>
+        /// Closes map voting poll
+        /// </summary>
         public static async Task HideMapVoters()
         {
             foreach (MapVote mv in MapVoteSigns)

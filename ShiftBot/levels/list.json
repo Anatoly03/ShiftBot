@@ -21,7 +21,7 @@
     "Id": 3,
     "Title": "Gravity Crystals",
     "Creator": "Anatoly",
-    "Difficulty": 0
+    "Difficulty": 1
   },
   {
     "Id": 4,
@@ -63,12 +63,18 @@
     "Id": 11,
     "Title": "Temple of Legends",
     "Creator": "Anatoly",
-    "Difficulty": 0
+    "Difficulty": 4
   },
   {
     "Id": 12,
     "Title": "Gravity Binder I",
     "Creator": "K_Advanced",
-    "Difficulty": 0
+    "Difficulty": 3
+  },
+  {
+    "Id": 13,
+    "Title": "Devil's Railway",
+    "Creator": "Anatoly",
+    "Difficulty": 2
   }
 ]
