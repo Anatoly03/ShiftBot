@@ -60,12 +60,6 @@ namespace ShiftBot
                     break;
 
                 case "help":
-                    if (player.IsMod)
-                    {
-                        await player.Tell(".fullname, .name - set the world name to.. (.name renames the prefix)");
-                        await player.Tell(".scan worldid - opens a scanner in a new world");
-                        await player.Tell(".kill, .start - continue the game process (eliminate players or start game)");
-                    }
                     await player.Tell(".aminoob - shows your noob percentage");
                     await player.Tell(".stats, .s - shows your player staticstics");
                     break;
@@ -85,9 +79,23 @@ namespace ShiftBot
                         await player.Tell($"You're a noob with a probability of {i}%");
                     }
                     break;
+            }
+        }
+
+        public async static Task AdminMessageHandler(Command c)
+        {
+            Player player = c.Sender;
+            switch (c.Cmd)
+            {
+                case "help":
+                    await player.Tell(".fullname, .name - set the world name to.. (.name renames the prefix)");
+                    await player.Tell(".scan worldid - opens a scanner in a new world");
+                    await player.Tell(".kill, .start - continue the game process (eliminate players or start game)");
+                    await DefaultMessageHandler(c); //  For complete informations without rewriting code.
+                    break;
 
                 case "build":
-                    if (player.IsMod && c.ArgNum > 0)
+                    if (c.ArgNum > 0)
                     {
                         try
                         {
@@ -104,44 +112,34 @@ namespace ShiftBot
                     break;
 
                 case "fullname":
-                    if (player.IsMod)
-                    {
-                        string title = c[0];
-                        await SayCommand($"title {title}");
-                    }
+                    string fulltitle = c[0];
+                    await SayCommand($"title {fulltitle}");
                     break;
 
                 case "name":
-                    if (player.IsMod)
-                    {
-                        string title = c[0];
-                        await SayCommand($"title {title}: CC Shift");
-                    }
+                    string title = c[0];
+                    await SayCommand($"title {title}: CC Shift");
                     break;
 
                 case "kill":
                 case "start":
-                    if (player.IsMod)
+                    await Task.Run(async () =>
                     {
-                        await Task.Run(async () =>
-                        {
-                            await ContinueGame();
-                        });
-                    }
+                        await ContinueGame();
+                    });
                     break;
 
                 case "scan":
-                    if (player.IsMod && c.ArgNum > 0)
+                    if (c.ArgNum > 0)
                     {
                         await OpenScanner(c[0], player);
                     }
                     break;
-            }
-        }
 
-        public async static Task AdminMessageHandler(Command c)
-        {
-            await DefaultMessageHandler(c);
+                default:
+                    await DefaultMessageHandler(c);
+                    break;
+            }
         }
     }
 
