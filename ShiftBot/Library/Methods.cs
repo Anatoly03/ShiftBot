@@ -13,7 +13,7 @@ using Colorful;
 
 namespace ShiftBot
 {
-    partial class Program
+    public partial class Program
     {
         /*
          * General methods
@@ -79,15 +79,15 @@ namespace ShiftBot
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
-                    Thread.Sleep(Math.Max((int)Math.Floor(50 / Math.Log2(max - buffer.Count + 3)), 0));
+                    await Task.Delay(Math.Max((int)Math.Floor(50 / Math.Log2(max - buffer.Count + 3)), 0));
                     await PlaceBlock(pair.Key.L, pair.Key.X, pair.Key.Y, pair.Value.Id);
                 }
                 buffer.Remove(pair.Key);
             }
 
-            Thread.Sleep(25);
+            await Task.Delay(25);
             await PlaceBlock(1, 49, 86, 13);
-            Thread.Sleep(25);
+            await Task.Delay(25);
             await PlaceBlock(1, 47, 86, 13);
         }
 

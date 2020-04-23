@@ -112,5 +112,10 @@ namespace ShiftBot
         {
             L = l;
         }
+
+        public static implicit operator int[](LCoordinate c)
+        {
+            return new int[] { c.L, c.X, c.Y };
+        }
     }
 }

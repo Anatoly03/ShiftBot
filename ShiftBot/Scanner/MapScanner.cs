@@ -15,7 +15,7 @@ namespace ShiftBot
     {
         public static MapScanner Scanner = new MapScanner();
 
-        static async Task OpenScanner(string worldid, Player p)
+        public static async Task OpenScanner(string worldid, Player p)
         {
             Scanner.ScannerOpenedBy = p;
             await Scanner.Open(worldid);
