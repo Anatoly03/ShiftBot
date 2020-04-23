@@ -56,23 +56,23 @@ namespace ShiftBot
             switch (c.Cmd)
             {
                 case "ping":
-                    await SayPrivate(player, "Pong!");
+                    await player.Tell("Pong!");
                     break;
 
                 case "help":
                     if (player.IsMod)
                     {
-                        await SayPrivate(player, ".fullname, .name - set the world name to.. (.name renames the prefix)");
-                        await SayPrivate(player, ".scan worldid - opens a scanner in a new world");
-                        await SayPrivate(player, ".kill, .start - continue the game process (eliminate players or start game)");
+                        await player.Tell(".fullname, .name - set the world name to.. (.name renames the prefix)");
+                        await player.Tell(".scan worldid - opens a scanner in a new world");
+                        await player.Tell(".kill, .start - continue the game process (eliminate players or start game)");
                     }
-                    await SayPrivate(player, ".aminoob - shows your noob percentage");
-                    await SayPrivate(player, ".stats, .s - shows your player staticstics");
+                    await player.Tell(".aminoob - shows your noob percentage");
+                    await player.Tell(".stats, .s - shows your player staticstics");
                     break;
 
                 case "stats":
                 case "s":
-                    await SayPrivate(player, "You have 0 wins, 0 players, .. stats basically");
+                    await player.Tell("You have 0 wins, 0 players, .. stats basically");
                     break;
 
                 case "aminub":
@@ -82,7 +82,7 @@ namespace ShiftBot
                 case "aminewb":
                     {
                         int i = new Random(player.Name.GetHashCode()).Next(0, 101);
-                        await SayPrivate(player, $"You're a noob with a probability of {i}%");
+                        await player.Tell($"You're a noob with a probability of {i}%");
                     }
                     break;
 
@@ -98,7 +98,7 @@ namespace ShiftBot
                         }
                         catch
                         {
-                            await SayPrivate(player, $"Error! Either there is no map with that id, or this is not an integer.");
+                            await player.Tell($"Error! Either there is no map with that id, or this is not an integer.");
                         }
                     }
                     break;

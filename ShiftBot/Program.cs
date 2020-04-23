@@ -204,11 +204,13 @@ namespace ShiftBot
                     if (player.IsMod)
                     {
                         Console.Write(player.Name, Color.Orange);
+                        player.OnMessage = Player.AdminMessageHandler;
                         await SayCommand($"giveedit {player.Name}");
                     }
                     else
                     {
                         Console.Write(player.Name, Color.Silver);
+                        player.OnMessage = Player.DefaultMessageHandler;
                     }
                     Console.WriteLine($" joined! ({new Random(player.Name.GetHashCode()).Next(0, 101)}% noob)");
 
