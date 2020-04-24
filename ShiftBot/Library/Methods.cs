@@ -623,7 +623,7 @@ namespace ShiftBot
                     isBuilding = false;
                 }
             }
-            catch(TaskCanceledException e)
+            catch(TaskCanceledException)
             {
                 await ResetGame();
             }
