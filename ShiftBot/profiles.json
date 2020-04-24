@@ -173,5 +173,12 @@
     "Wins": 0,
     "Plays": 0,
     "Points": 0
+  },
+  "lsplash": {
+    "Name": "lsplash",
+    "IsMod": false,
+    "Wins": 0,
+    "Plays": 0,
+    "Points": 0
   }
 }
