@@ -519,10 +519,10 @@ namespace ShiftBot
                 {
                     Formatter[] format =
                     {
-                    new Formatter(newMap.Title, Color.Cyan),
-                    new Formatter(newMap.Id.ToString(), Color.Gray),
-                    new Formatter(newMap.Creator, Color.Cyan),
-                };
+                        new Formatter(newMap.Title, Color.Cyan),
+                        new Formatter(newMap.Id.ToString(), Color.Gray),
+                        new Formatter(newMap.Creator, Color.Cyan),
+                    };
 
                     Console.WriteLineFormatted("  Map {0} ({1}) By {2}", Color.Silver, format);
                 }
@@ -540,6 +540,16 @@ namespace ShiftBot
                         await SayCommand($"reset {p.Name}");
                         await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
                         PlayersInGame.Add(p);
+                    }
+
+                    if (PlayersInGame.Count < 3)
+                    {
+                        isTrainMode = true;
+                        await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
+                    }
+                    else
+                    {
+                        isTrainMode = false;
                     }
 
                     Console.Write("* ", Color.Silver);
@@ -562,11 +572,11 @@ namespace ShiftBot
 
                     Formatter[] format =
                     {
-                    new Formatter("Round", Color.White),
-                    new Formatter(round, Color.Gold),
-                    new Formatter(PlayersInGame.Count, Color.Green),
-                    new Formatter(playersBefore - PlayersInGame.Count, Color.Green),
-                };
+                        new Formatter("Round", Color.White),
+                        new Formatter(round, Color.Gold),
+                        new Formatter(PlayersInGame.Count, Color.Green),
+                        new Formatter(playersBefore - PlayersInGame.Count, Color.Green),
+                    };
 
                     Console.WriteLineFormatted("    {0} {1}! {2} joined the round, {3} eliminated", Color.Silver, format);
                 }

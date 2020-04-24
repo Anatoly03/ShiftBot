@@ -60,12 +60,6 @@
     "Difficulty": 2
   },
   {
-    "Id": 11,
-    "Title": "Temple of Legends",
-    "Creator": "Anatoly",
-    "Difficulty": 4
-  },
-  {
     "Id": 12,
     "Title": "Gravity Binder I",
     "Creator": "K_Advanced",
@@ -78,9 +72,21 @@
     "Difficulty": 2
   },
   {
-    "Id": 14,
+    "Id": 15,
+    "Title": "Red Tornados",
+    "Creator": "K_Advanced",
+    "Difficulty": 3
+  },
+  {
+    "Id": 16,
     "Title": "Converse Roots",
     "Creator": "K_Advanced",
-    "Difficulty": 0
+    "Difficulty": 2
+  },
+  {
+    "Id": 17,
+    "Title": "Temple of Legends",
+    "Creator": "Anatoly",
+    "Difficulty": 4
   }
 ]

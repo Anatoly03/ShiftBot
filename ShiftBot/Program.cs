@@ -43,6 +43,7 @@ namespace ShiftBot
         public static int round;
         public static bool isBuilding;
         public static bool isDoorOpen;
+        public static bool isTrainMode;
 
         public static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented };
