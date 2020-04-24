@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using static ShiftBot.Program;
@@ -37,10 +38,7 @@ namespace ShiftBot
                 IsMod = false;
 
                 Profiles.Add(Name, new Profile(Name));
-                using (StreamWriter file = File.CreateText($"../../../profiles.json"))
-                {
-                    file.WriteLine(JsonConvert.SerializeObject(Profiles, Json_settings));
-                }
+                saveProfiles();
             }
         }
 
@@ -53,6 +51,8 @@ namespace ShiftBot
         public async static Task DefaultMessageHandler(Command c)
         {
             Player player = c.Sender;
+            Profile profile = Profiles[c.Sender.Name];
+
             switch (c.Cmd)
             {
                 case "ping":
@@ -66,7 +66,7 @@ namespace ShiftBot
 
                 case "stats":
                 case "s":
-                    await player.Tell("You have 0 wins, 0 players, .. stats basically");
+                    await player.Tell($"You have: {profile.Wins} wins, {profile.Points} points, {profile.Plays} plays");
                     break;
 
                 case "aminub":
@@ -94,23 +94,6 @@ namespace ShiftBot
                     await DefaultMessageHandler(c); //  For complete informations without rewriting code.
                     break;
 
-                case "build":
-                    if (c.ArgNum > 0)
-                    {
-                        try
-                        {
-                            await BuildMap(int.Parse(c[0]));
-                            await OpenEntrance();
-                            await Task.Delay(1000);
-                            await CloseEntrance();
-                        }
-                        catch
-                        {
-                            await player.Tell($"Error! Either there is no map with that id, or this is not an integer.");
-                        }
-                    }
-                    break;
-
                 case "fullname":
                     string fulltitle = c[0];
                     await SayCommand($"title {fulltitle}");
@@ -125,11 +108,18 @@ namespace ShiftBot
                 case "start":
                     await Task.Run(async () =>
                     {
+                        if (PlayersInGame.Count > 0)
+                            if (PlayersSafe.Count == 0)
+                                await Say($"Round was forced to end! Everyone's eliminated!");
+                            else if (PlayersSafe.Count == 1)
+                                await Say($"Round was forced to end! {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+                            else
+                                await Say($"Round was forced to end! Players not finished are eliminated!");
                         await ContinueGame();
                     });
                     break;
 
-                case "scan":
+                case "scanner":
                     if (c.ArgNum > 0)
                     {
                         await OpenScanner(c[0], player);

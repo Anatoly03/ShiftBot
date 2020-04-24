@@ -54,6 +54,18 @@ namespace ShiftBot
         public static string TimeToString(TimeSpan ts) => String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10) +  "s";
 
         /*
+         * Input & Output
+         */
+
+        public static void saveProfiles()
+        {
+            using (StreamWriter file = File.CreateText($"../../../profiles.json"))
+            {
+                file.WriteLine(JsonConvert.SerializeObject(Profiles, Json_settings));
+            }
+        }
+
+        /*
          * General methods
          */
 
