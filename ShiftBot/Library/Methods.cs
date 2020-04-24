@@ -122,15 +122,15 @@ namespace ShiftBot
         /// <summary>
         /// Builds a map by id
         /// </summary>
-        public static async Task BuildMap(int id)
+        public static async Task BuildMap(int id, CancellationToken token = default)
         {
-            await BuildMap(Maps.FirstOrDefault(m => m.Id == id));
+            await BuildMap(Maps.FirstOrDefault(m => m.Id == id), token);
         }
 
         /// <summary>
         /// Builds a map by MapInfo
         /// </summary>
-        public static async Task BuildMap(MapInfo info)
+        public static async Task BuildMap(MapInfo info, CancellationToken token = default)
         {
             var buffer = new Dictionary<LCoordinate, Block>();
             var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{info.Id}/map.json"), Json_settings);
@@ -151,7 +151,7 @@ namespace ShiftBot
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
-                    Thread.Sleep(5);
+                    await Task.Delay(5, token);
                     await pair.Value.Place(pair.Key.L, pair.Key.X, pair.Key.Y);
                 }
                 buffer.Remove(pair.Key);
@@ -181,7 +181,7 @@ namespace ShiftBot
                 var pair = buffer.ElementAt(new Random().Next(0, buffer.Count));
                 if (World[pair.Key.L, pair.Key.X, pair.Key.Y].Id != pair.Value.Id)
                 {
-                    Thread.Sleep(15);
+                    await Task.Delay(15);
                     await PlaceBlock(pair.Key.L, pair.Key.X, pair.Key.Y, pair.Value.Id);
                 }
                 buffer.Remove(pair.Key);
@@ -274,13 +274,13 @@ namespace ShiftBot
 
             // Prepare countdown to close the door.
             EntranceCooldown = new System.Timers.Timer(7000);
-            EntranceCooldown.Elapsed += async (Object s, ElapsedEventArgs e) => {
+            EntranceCooldown.Elapsed += async (object s, ElapsedEventArgs e) => {
                 await CloseEntrance();
                 EntranceCooldown.Stop();
             };
 
             EntranceMovement = new System.Timers.Timer(500);
-            EntranceMovement.Elapsed += async (Object s, ElapsedEventArgs e) => {
+            EntranceMovement.Elapsed += async (object s, ElapsedEventArgs e) => {
                 await CloseEntrance();
                 EntranceMovement.Stop();
             };
@@ -472,150 +472,160 @@ namespace ShiftBot
         /// </summary>
         public static async Task ContinueGame()
         {
-            if (!isBuilding)
+            try
             {
-                isBuilding = true;
-
-                if (Tick != null)
-                    Tick.Stop();
-                if (Eliminator != null)
-                    Eliminator.Stop();
-                if (TimeLimit != null)
-                    TimeLimit.Stop();
-
-                await HideMapVoters();
-                await ClearGameArea();
-
-                Thread.Sleep(6000);
-
-                int maxVotes = 0;
-                var chose = new List<MapInfo>();
-                foreach (MapVote mv in MapVoteSigns)
+                if (!isBuilding)
                 {
-                    if (maxVotes < mv.Votes)
+                    isBuilding = true;
+                    isGameAborted = new CancellationTokenSource();
+
+                    if (Tick != null)
+                        Tick.Stop();
+                    if (Eliminator != null)
+                        Eliminator.Stop();
+                    if (TimeLimit != null)
+                        TimeLimit.Stop();
+
+                    await HideMapVoters();
+                    await ClearGameArea();
+
+                    await Task.Delay(6000, isGameAborted.Token);
+
+                    int maxVotes = 0;
+                    var chose = new List<MapInfo>();
+                    foreach (MapVote mv in MapVoteSigns)
                     {
-                        maxVotes = mv.Votes;
-                        chose.Clear();
-                        chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
-                    }
-                    else if (maxVotes == mv.Votes)
-                    {
-                        chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
-                    }
-                }
-
-                MapInfo newMap = Maps.ElementAt(0);
-                if (chose.Count == 1)
-                {
-                    newMap = chose.ElementAt(0);
-                }
-                else if (chose.Count > 1)
-                {
-                    newMap = chose.ElementAt(new Random().Next(0, chose.Count));
-                }
-                await BuildMap(newMap);
-                await CreateExit();
-
-                {
-                    Formatter[] format =
-                    {
-                        new Formatter(newMap.Title, Color.Cyan),
-                        new Formatter(newMap.Id.ToString(), Color.Gray),
-                        new Formatter(newMap.Creator, Color.Cyan),
-                    };
-
-                    Console.WriteLineFormatted("  Map {0} ({1}) By {2}", Color.Silver, format);
-                }
-
-
-                if (PlayersSafe.Count < 2)
-                {
-                    round = 1;
-
-                    PlayersInGame = new List<Player>();
-                    PlayersSafe = new Dictionary<Player, TimeSpan>();
-
-                    foreach (Player p in Players)
-                    {
-                        await SayCommand($"reset {p.Name}");
-                        await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
-                        PlayersInGame.Add(p);
+                        if (maxVotes < mv.Votes)
+                        {
+                            maxVotes = mv.Votes;
+                            chose.Clear();
+                            chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
+                        }
+                        else if (maxVotes == mv.Votes)
+                        {
+                            chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
+                        }
                     }
 
-                    if (PlayersInGame.Count < 3)
+                    MapInfo newMap = Maps.ElementAt(0);
+                    if (chose.Count == 1)
                     {
-                        isTrainMode = true;
-                        await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
+                        newMap = chose.ElementAt(0);
+                    }
+                    else if (chose.Count > 1)
+                    {
+                        newMap = chose.ElementAt(new Random().Next(0, chose.Count));
+                    }
+                    await BuildMap(newMap, isGameAborted.Token);
+                    await CreateExit();
+
+                    {
+                        Formatter[] format =
+                        {
+                            new Formatter(newMap.Title, Color.Cyan),
+                            new Formatter(newMap.Id.ToString(), Color.Gray),
+                            new Formatter(newMap.Creator, Color.Cyan),
+                        };
+
+                        Console.WriteLineFormatted("  Map {0} ({1}) By {2}", Color.Silver, format);
+                    }
+
+
+                    if (PlayersSafe.Count < 2)
+                    {
+                        round = 1;
+
+                        PlayersInGame = new List<Player>();
+                        PlayersSafe = new Dictionary<Player, TimeSpan>();
+
+                        foreach (Player p in Players)
+                        {
+                            await SayCommand($"reset {p.Name}");
+                            await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
+                            PlayersInGame.Add(p);
+                        }
+
+                        if (PlayersInGame.Count < 3)
+                        {
+                            isTrainMode = true;
+                            await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
+                        }
+                        else
+                        {
+                            isTrainMode = false;
+                        }
+
+                        Console.Write("* ", Color.Silver);
+                        Console.Write("NEW GAME! ");
+                        Console.WriteLine($"{Players.Count} in world, {PlayersInGame.Count} joined", Color.DarkGray);
                     }
                     else
                     {
-                        isTrainMode = false;
+                        round++;
+
+                        int playersBefore = PlayersInGame.Count;
+                        PlayersInGame = new List<Player>();
+
+                        foreach (KeyValuePair<Player, TimeSpan> p in PlayersSafe)
+                        {
+                            PlayersInGame.Add(p.Key);
+                        }
+
+                        PlayersSafe = new Dictionary<Player, TimeSpan>();
+
+                        Formatter[] format =
+                        {
+                            new Formatter("Round", Color.White),
+                            new Formatter(round, Color.Gold),
+                            new Formatter(PlayersInGame.Count, Color.Green),
+                            new Formatter(playersBefore - PlayersInGame.Count, Color.Green),
+                        };
+
+                        Console.WriteLineFormatted("    {0} {1}! {2} joined the round, {3} eliminated", Color.Silver, format);
                     }
 
-                    Console.Write("* ", Color.Silver);
-                    Console.Write("NEW GAME! ");
-                    Console.WriteLine($"{Players.Count} in world, {PlayersInGame.Count} joined", Color.DarkGray);
-                }
-                else
-                {
-                    round++;
-
-                    int playersBefore = PlayersInGame.Count;
-                    PlayersInGame = new List<Player>();
-
-                    foreach (KeyValuePair<Player, TimeSpan> p in PlayersSafe)
-                    {
-                        PlayersInGame.Add(p.Key);
-                    }
-
-                    PlayersSafe = new Dictionary<Player, TimeSpan>();
-
-                    Formatter[] format =
-                    {
-                        new Formatter("Round", Color.White),
-                        new Formatter(round, Color.Gold),
-                        new Formatter(PlayersInGame.Count, Color.Green),
-                        new Formatter(playersBefore - PlayersInGame.Count, Color.Green),
-                    };
-
-                    Console.WriteLineFormatted("    {0} {1}! {2} joined the round, {3} eliminated", Color.Silver, format);
-                }
-
-                TimeLimit = new System.Timers.Timer(150 * 1000);
-                TimeLimit.Elapsed += async (Object s, ElapsedEventArgs e) => {
-                    await Say($"Time's over!");
-                    await ContinueGame();
-                };
-
-                int k = Math.Max(35 - round * 5, 10);
-                //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                Eliminator = new System.Timers.Timer(k * 1000);
-                Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
-                    if (PlayersSafe.Count == 1)
-                    {
-                        await Say($"{PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
-                    }
-                    else
+                    TimeLimit = new System.Timers.Timer(150 * 1000);
+                    TimeLimit.Elapsed += async (object s, ElapsedEventArgs e) =>
                     {
                         await Say($"Time's over!");
-                    }
-                    await ContinueGame();
-                };
+                        await ContinueGame();
+                    };
 
-                Thread.Sleep(5000);
-                await MakeGravity();
-                await OpenEntrance();
-                Thread.Sleep(500);
-                await ReleasePlayers();
-                startTime = DateTime.Now;
-                TimeLimit.Start();
+                    int k = Math.Max(35 - round * 5, 10);
+                    //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
+                    Eliminator = new System.Timers.Timer(k * 1000);
+                    Eliminator.Elapsed += async (object s, ElapsedEventArgs e) =>
+                    {
+                        if (PlayersSafe.Count == 1)
+                        {
+                            await Say($"{PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+                        }
+                        else
+                        {
+                            await Say($"Time's over!");
+                        }
+                        await ContinueGame();
+                    };
 
-                Thread.Sleep(2000);
-                await CreateSafeArea();
-                foreach (Player p in Players) p.Vote = -1;
-                await RegenerateMapVoters();
-                Tick.Start();
-                isBuilding = false;
+                    await Task.Delay(5000, isGameAborted.Token);
+                    await MakeGravity();
+                    await OpenEntrance();
+                    await Task.Delay(500, isGameAborted.Token);
+                    await ReleasePlayers();
+                    startTime = DateTime.Now;
+                    TimeLimit.Start();
+
+                    await Task.Delay(2000, isGameAborted.Token);
+                    await CreateSafeArea();
+                    foreach (Player p in Players) p.Vote = -1;
+                    await RegenerateMapVoters();
+                    Tick.Start();
+                    isBuilding = false;
+                }
+            }
+            catch(TaskCanceledException e)
+            {
+                await ResetGame();
             }
         }
 
@@ -663,6 +673,33 @@ namespace ShiftBot
                     await ContinueGame();
                 }
             }
+        }
+
+        public static async Task AbortGame()
+        {
+            if(Tick.Enabled)
+                await ResetGame();
+            else
+                isGameAborted.Cancel();
+        }
+
+        public static async Task ResetGame()
+        {
+            isBuilding = true;
+            await Say("Game canceled!");
+
+            if (Tick != null)
+                Tick.Stop();
+            if (Eliminator != null)
+                Eliminator.Stop();
+            if (TimeLimit != null)
+                TimeLimit.Stop();
+
+            foreach (Player p in Players) p.Vote = -1;
+            await RegenerateMapVoters();
+
+            await ClearGameArea();
+            isBuilding = false;
         }
     }
 }

@@ -108,15 +108,22 @@ namespace ShiftBot
                 case "start":
                     await Task.Run(async () =>
                     {
-                        if (PlayersInGame.Count > 0)
-                            if (PlayersSafe.Count == 0)
-                                await Say($"Round was forced to end! Everyone's eliminated!");
-                            else if (PlayersSafe.Count == 1)
-                                await Say($"Round was forced to end! {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
-                            else
-                                await Say($"Round was forced to end! Players not finished are eliminated!");
-                        await ContinueGame();
+                        if (!isBuilding)
+                        {
+                            if (PlayersInGame.Count > 0)
+                                if (PlayersSafe.Count == 0)
+                                    await Say($"Round was forced to end! Everyone's eliminated!");
+                                else if (PlayersSafe.Count == 1)
+                                    await Say($"Round was forced to end! {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+                                else
+                                    await Say($"Round was forced to end! Players not finished are eliminated!");
+                            await ContinueGame();
+                        }
                     });
+                    break;
+
+                case "stop":
+                    await AbortGame();
                     break;
 
                 case "scanner":

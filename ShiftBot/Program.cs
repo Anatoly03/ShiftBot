@@ -55,6 +55,8 @@ namespace ShiftBot
         public static System.Timers.Timer Eliminator; // Eliminate after 5-20 seconds, after the first player arrived.
         public static System.Timers.Timer TimeLimit; // Eliminate after 5-20 seconds, after the first player arrived.
 
+        public static CancellationTokenSource isGameAborted = new CancellationTokenSource();
+
         /*
          * Difficulties
          *
@@ -213,7 +215,7 @@ namespace ShiftBot
 
                         startTime = DateTime.Now;
                         Tick = new System.Timers.Timer(50);
-                        Tick.Elapsed += async (Object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
+                        Tick.Elapsed += async (object s, ElapsedEventArgs e) => { await TickEvent(s, e); };
 
                         await RegenerateMapVoters();
                     }
@@ -345,7 +347,7 @@ namespace ShiftBot
             }
         }
 
-        static async Task TickEvent(Object s, ElapsedEventArgs e)
+        static async Task TickEvent(object s, ElapsedEventArgs e)
         {
             await UpdateSign();
         }
