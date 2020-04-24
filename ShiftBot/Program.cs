@@ -16,6 +16,12 @@ namespace ShiftBot
     partial class Program
     {
         /*
+         * Configuration
+         */
+        public static string WorldId;
+        public static Coordinate TopLeftShiftCoord;
+
+        /*
          * Variables
          */
         public static Connection Con;
@@ -26,12 +32,7 @@ namespace ShiftBot
         public static Dictionary<Player, TimeSpan> PlayersSafe = new Dictionary<Player, TimeSpan>();
         public static List<MapInfo> Maps;
         public static MapInfo currentMap;
-        public static List<MapVote> MapVoteSigns = new List<MapVote> {
-            new MapVote(0, 44, 90),
-            new MapVote(1, 46, 90),
-            new MapVote(2, 53, 90),
-            new MapVote(3, 55, 90),
-        };
+        public static List<MapVote> MapVoteSigns;
 
         public static int Width;
         public static int Height;
@@ -81,6 +82,29 @@ namespace ShiftBot
              */
             Profiles = JsonConvert.DeserializeObject<Dictionary<string, Profile>>(File.ReadAllText("../../../profiles.json"), Json_settings);
 
+            var config = File.ReadAllLines("../../../config.txt");
+
+            foreach (string line in config)
+            {
+                var param = line.Split(' ');
+                switch (param[0])
+                {
+                    case "worldid":
+                        WorldId = param[1];
+                        break;
+
+                    case "corner":
+                        TopLeftShiftCoord = new Coordinate(int.Parse(param[1]), int.Parse(param[2]));
+                        MapVoteSigns = new List<MapVote> {
+                            new MapVote(0, TopLeftShiftCoord.X + 13, TopLeftShiftCoord.Y + 26),
+                            new MapVote(1, TopLeftShiftCoord.X + 15, TopLeftShiftCoord.Y + 26),
+                            new MapVote(2, TopLeftShiftCoord.X + 22, TopLeftShiftCoord.Y + 26),
+                            new MapVote(3, TopLeftShiftCoord.X + 24, TopLeftShiftCoord.Y + 26),
+                        };
+                        break;
+                }
+            }
+
             await Main2(File.ReadAllLines("../../../cookie.txt"));
         }
 
@@ -99,7 +123,7 @@ namespace ShiftBot
 
                 await client.ConnectAsync();
 
-                Con = (Connection) client.CreateWorldConnection("tPy8SPndRwTI");
+                Con = (Connection) client.CreateWorldConnection(WorldId);
 
                 Con.OnMessage += async (s, m) =>
                 {
@@ -250,7 +274,7 @@ namespace ShiftBot
                         double my = m.GetDouble(6);
 
                         if (playerInGame != null)
-                            if (mx > 32 && mx < 74 && my > 65 && my < 84)
+                            if (mx > TopLeftShiftCoord.X + 1 && mx < TopLeftShiftCoord.X + 42 && my > TopLeftShiftCoord.Y + 1 && my < TopLeftShiftCoord.X + 20)
                                 if (isDoorOpen)
                                     EntranceMovement.Start();
 
@@ -310,7 +334,12 @@ namespace ShiftBot
                     break;
 
                 case MessageType.Chat:
-                    await Players[m.GetInt(0)].OnMessage(new Command(Players[m.GetInt(0)], m.GetString(1)));
+                    if (m.GetInt(0) != BotId)
+                    {
+                        player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
+                        await player.OnMessage(new Command(player, m.GetString(1)));
+                    }
+                    
                     break;
             }
         }
@@ -343,7 +372,7 @@ namespace ShiftBot
                     display += $"\n1. {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} {TimeToString(PlayersSafe.ElementAt(0).Value)}";
 
 
-                await PlaceSign(47, 86, 58, display, 1);
+                await PlaceSign(TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 58, display, 1);
             }
         }
     }

@@ -2,8 +2,42 @@
 
 ## Table of Contents
 
+- [Setting up](#setup)
 - [Game Process](#game-process)
 - [Commands](#moderation)
+
+## Setup
+
+### Create the `cookie.txt` file
+
+To login, create the file `cookie.txt` at the level of `Program.cs` The first line defines the login style, the second line the TOKEN.
+
+#### Google
+
+```
+google
+TOKEN
+```
+
+#### 15-minutes token
+
+```
+token
+TOKEN
+```
+
+### Create the `config.txt` file
+
+The configuration file keeps individual settings like worldid
+
+Example for a 100x100 world:
+
+```
+corner 31 64
+worldid tPy8SPndRwTI
+```
+
+- The `corner x y` defines the top left corner of the level, **not** the arrows. So the minimum value should be 1 1 (for)
 
 ## Game Process
 

@@ -50,14 +50,14 @@
   {
     "Id": 8,
     "Title": "Dread and Roses",
-    "Creator": "K-Advanced",
+    "Creator": "K_Advanced",
     "Difficulty": 1
   },
   {
     "Id": 9,
     "Title": "A trip through chaos",
     "Creator": "LeoGiaco",
-    "Difficulty": 3
+    "Difficulty": 2
   },
   {
     "Id": 11,
@@ -76,5 +76,11 @@
     "Title": "Devil's Railway",
     "Creator": "Anatoly",
     "Difficulty": 2
+  },
+  {
+    "Id": 14,
+    "Title": "Converse Roots",
+    "Creator": "K_Advanced",
+    "Difficulty": 0
   }
 ]

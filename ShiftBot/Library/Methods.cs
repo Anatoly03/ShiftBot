@@ -64,12 +64,28 @@ namespace ShiftBot
         {
             var buffer = new Dictionary<LCoordinate, Block>();
 
+            if (currentMap != null)
+            {
+                var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{currentMap.Id}/map.json"), Json_settings);
+
+                var effects = new[] { 93, 94 };
+                for (int x = TopLeftShiftCoord.X; x < TopLeftShiftCoord.X + 38; x++)
+                    for (int y = TopLeftShiftCoord.Y; y < TopLeftShiftCoord.Y + 22; y++)
+                        if (effects.Contains(map[1, x - TopLeftShiftCoord.X, y - TopLeftShiftCoord.Y].Id))
+                            await PlaceBlock(1, x, y, 0);
+
+                foreach (Player p in PlayersInGame)
+                {
+                    await SayCommand($"effect {p.Name} clear");
+                }
+            }
+
             for (int l = 0; l < 2; l++)
-                for (int x = 30; x < 70; x++)
-                    for (int y = 64; y < 88; y++)
-                        if (l == 1 && y == 84 && x > 44 && x < 55)
-                            buffer.Add(new LCoordinate(l, x, y), x > 49 ? new Block(15) : new Block(13));
-                        else if (!(y > 84 && x > 45 && x < 54) && !(x == 69 && y == 86))
+                for (int x = TopLeftShiftCoord.X - 1; x < TopLeftShiftCoord.X + 39; x++)
+                    for (int y = TopLeftShiftCoord.Y; y < TopLeftShiftCoord.Y + 24; y++)
+                        if (l == 1 && y == TopLeftShiftCoord.Y + 20 && x > TopLeftShiftCoord.X + 13 && x < TopLeftShiftCoord.X + 24)
+                            buffer.Add(new LCoordinate(l, x, y), x > TopLeftShiftCoord.X + 18 ? new Block(15) : new Block(13));
+                        else if (!(y > TopLeftShiftCoord.Y + 20 && x > TopLeftShiftCoord.X + 14 && x < TopLeftShiftCoord.X + 23))
                             buffer.Add(new LCoordinate(l, x, y), new Block(0));
 
             await CloseSafeArea();
@@ -86,9 +102,9 @@ namespace ShiftBot
             }
 
             await Task.Delay(25);
-            await PlaceBlock(1, 49, 86, 13);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 13);
             await Task.Delay(25);
-            await PlaceBlock(1, 47, 86, 13);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 13);
         }
 
         /// <summary>
@@ -108,14 +124,14 @@ namespace ShiftBot
             var map = JsonConvert.DeserializeObject<Block[,,]>(File.ReadAllText($"../../../levels/{info.Id}/map.json"), Json_settings);
 
             for (int l = 0; l < 2; l++)
-                for (int x = 31; x < 69; x++)
-                    for (int y = 64; y < 86; y++)
-                        buffer.Add(new LCoordinate(l, x, y), map[l, x - 31, y - 64]);
+                for (int x = TopLeftShiftCoord.X; x < TopLeftShiftCoord.X + 38; x++)
+                    for (int y = TopLeftShiftCoord.Y; y < TopLeftShiftCoord.Y + 22; y++)
+                        buffer.Add(new LCoordinate(l, x, y), map[l, x - TopLeftShiftCoord.X, y - TopLeftShiftCoord.Y]);
 
-            for (int x = 30; x < 70; x++)
-                buffer.Add(new LCoordinate(1, x, 87), new Block(12));
+            for (int x = TopLeftShiftCoord.X - 1; x < TopLeftShiftCoord.X + 39; x++)
+                buffer.Add(new LCoordinate(1, x, TopLeftShiftCoord.Y + 23), new Block(12));
 
-            await PlaceSign(49, 88, 58, $"{info.Title}\nBy {info.Creator}", 1);
+            await PlaceSign(TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 24, 58, $"{info.Title}\nBy {info.Creator}", 1);
             currentMap = info;
 
             while (buffer.Count > 0)
@@ -137,15 +153,15 @@ namespace ShiftBot
         {
             var buffer = new Dictionary<LCoordinate, Block>();
 
-            for (int x = 30; x < 69; x++)
-                buffer.Add(new LCoordinate(1, x, 63), new Block(15));
+            for (int x = TopLeftShiftCoord.X - 1; x < TopLeftShiftCoord.X + 38; x++)
+                buffer.Add(new LCoordinate(1, x, TopLeftShiftCoord.Y - 1), new Block(15));
 
-            for (int y = 64; y < 87; y++)
-                buffer.Add(new LCoordinate(1, 30, y), new Block(14));
+            for (int y = TopLeftShiftCoord.Y; y < TopLeftShiftCoord.Y + 23; y++)
+                buffer.Add(new LCoordinate(1, TopLeftShiftCoord.X - 1, y), new Block(14));
 
-            for (int x = 31; x < 70; x++)
-                if (x != 46)
-                    buffer.Add(new LCoordinate(1, x, 86), new Block(13));
+            for (int x = TopLeftShiftCoord.X; x < TopLeftShiftCoord.X + 39; x++)
+                if (x != TopLeftShiftCoord.X + 15)
+                    buffer.Add(new LCoordinate(1, x, TopLeftShiftCoord.Y + 22), new Block(13));
 
             while (buffer.Count > 0)
             {
@@ -181,11 +197,11 @@ namespace ShiftBot
                     if (!isEntranceLeft)
                     {
                         isEntranceLeft = true;
-                        await PlaceBlock(1, 30, y + 63, 96);
+                        await PlaceBlock(1, TopLeftShiftCoord.X - 1, y + TopLeftShiftCoord.Y - 1, 96);
                     }
                     for (int i = 0; i < 3; i++)
                     {
-                        await PlaceBlock(1, 30 + i, y + 64, 15);
+                        await PlaceBlock(1, TopLeftShiftCoord.X - 1 + i, y + TopLeftShiftCoord.Y, 15);
                     }
                 }
             }
@@ -194,16 +210,16 @@ namespace ShiftBot
             if (!isEntranceLeft)
                 for (int x = 37; x > -1; x--)
                 {
-                    if (map[1, x,0].Id == 16)
+                    if (map[1, x, 0].Id == 16)
                     {
                         if (!isEntranceTop)
                         {
                             isEntranceTop = true;
-                            await PlaceBlock(1, x + 32, 63, 96);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X + 1, TopLeftShiftCoord.Y + 1, 96);
                         }
                         for (int i = 0; i < 3; i++)
                         {
-                            await PlaceBlock(1, x + 31, 63 + i, 0);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 1 + i, 0);
                         }
                     }
                 }
@@ -217,11 +233,11 @@ namespace ShiftBot
                         if (!isEntranceRight)
                         {
                             isEntranceRight = true;
-                            await PlaceBlock(1, 69, y + 65, 96);
+                            await PlaceBlock(1, TopLeftShiftCoord.X + 38, y + TopLeftShiftCoord.Y + 1, 96);
                         }
                         for (int i = 0; i < 3; i++)
                         {
-                            await PlaceBlock(1, 67 + i, y + 64, 13);
+                            await PlaceBlock(1, TopLeftShiftCoord.X + 36 + i, y + TopLeftShiftCoord.Y, 13);
                         }
                     }
                 }
@@ -235,11 +251,11 @@ namespace ShiftBot
                         if (!isEntranceBottom)
                         {
                             isEntranceBottom = true;
-                            await PlaceBlock(1, x + 31, 86, 96);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 22, 96);
                         }
                         for (int i = 0; i < 3; i++)
                         {
-                            await PlaceBlock(1, x + 31, 86 - i, 14);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 22 - i, 14);
                         }
                     }
                 }
@@ -305,7 +321,7 @@ namespace ShiftBot
                             await PlaceBlock(1, x + 31, 63, 15);
                             await PlaceBlock(1, x + 31, 64, 96);
                             await PlaceBlock(1, x + 31, 64, 96);
-                            await map[1, x, 0].Place(1, x + 31, 65);
+                            await map[1, x, 1].Place(1, x + 31, 65);
                         }
                     }
 
@@ -335,11 +351,11 @@ namespace ShiftBot
                             if (!isEntranceBottom)
                             {
                                 isEntranceBottom = true;
-                                await PlaceBlock(1, x + 31, 86, 96);
+                                await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 22, 96);
                             }
-                            await PlaceBlock(1, x + 31, 86, 13);
-                            await PlaceBlock(1, x + 31, 85, 96);
-                            await map[1, x, 20].Place(1, x + 31, 84);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 22, 13);
+                            await PlaceBlock(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 21, 96);
+                            await map[1, x, 20].Place(1, x + TopLeftShiftCoord.X, TopLeftShiftCoord.Y + 20);
                         }
                     }
             }
@@ -377,7 +393,7 @@ namespace ShiftBot
         /// </summary>
         public static async Task ReleasePlayers()
         {
-            await PlaceBlock(1, 46, 86, 13);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 15, TopLeftShiftCoord.Y + 22, 13);
             EntranceCooldown.Start();
         }
 
@@ -386,9 +402,9 @@ namespace ShiftBot
         /// </summary>
         public static async Task CreateSafeArea()
         {
-            await PlaceBlock(1, 46, 86, 96);
-            await PlaceBlock(1, 47, 86, 0);
-            await PlaceBlock(1, 49, 86, 70);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 15, TopLeftShiftCoord.Y + 22, 96);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 0);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 70);
         }
 
         /// <summary>
@@ -396,7 +412,7 @@ namespace ShiftBot
         /// </summary>
         public static async Task CloseSafeArea()
         {
-            await PlaceBlock(1, 53, 86, 96);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 22, TopLeftShiftCoord.Y + 22, 96);
         }
 
         /// <summary>
@@ -510,7 +526,7 @@ namespace ShiftBot
                     foreach (Player p in Players)
                     {
                         await SayCommand($"reset {p.Name}");
-                        await SayCommand($"tp {p.Name} 47 86");
+                        await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.X + 22}");
                         PlayersInGame.Add(p);
                     }
 
@@ -549,10 +565,18 @@ namespace ShiftBot
                     await ContinueGame();
                 };
 
-                int k = 20 * 1000;
+                int k = Math.Max(35 - round * 5, 10);
                 //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
-                Eliminator = new System.Timers.Timer(k);
+                Eliminator = new System.Timers.Timer(k * 1000);
                 Eliminator.Elapsed += async (Object s, ElapsedEventArgs e) => {
+                    if (PlayersSafe.Count == 1)
+                    {
+                        await Say($"{PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+                    }
+                    else
+                    {
+                        await Say($"Time's over!");
+                    }
                     await ContinueGame();
                 };
 
@@ -586,7 +610,7 @@ namespace ShiftBot
                 {
                     firstPerson = DateTime.Now;
 
-                    int k = 20;
+                    int k = Math.Max(35 - round * 5, 10);
                     //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
                     string s = $"{k} seconds left!";
                     await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
@@ -597,7 +621,7 @@ namespace ShiftBot
                 PlayersSafe.Add(player, ts);
 
                 await SayCommand($"reset {player.Name}");
-                await SayCommand($"tp {player.Name} 47 86");
+                await SayCommand($"tp {player.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.X + 22}");
 
                 await SayPrivate(player, $"Your Time: {elapsedTime}s");
                 await UpdateSign();
