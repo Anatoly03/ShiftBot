@@ -114,9 +114,19 @@ namespace ShiftBot
                                 if (PlayersSafe.Count == 0)
                                     await Say($"Round was forced to end! Everyone's eliminated!");
                                 else if (PlayersSafe.Count == 1)
+                                {
                                     await Say($"Round was forced to end! {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+
+                                    if (!isTrainMode)
+                                    {
+                                        Profiles[PlayersSafe.ElementAt(0).Key.Name].Wins++;
+                                        saveProfiles();
+                                    }
+                                }
                                 else
+                                {
                                     await Say($"Round was forced to end! Players not finished are eliminated!");
+                                }
                             await ContinueGame();
                         }
                     });
@@ -144,17 +154,19 @@ namespace ShiftBot
     {
         public string Name { get; set; }
         public bool IsMod { get; set; }
-        public int Wins { get; set; }
         public int Plays { get; set; }
         public int Points { get; set; }
+        public int Rounds { get; set; }
+        public int Wins { get; set; }
 
         public Profile(string _name)
         {
             Name = _name;
             IsMod = false;
-            Wins = 0;
             Plays = 0;
             Points = 0;
+            Rounds = 0;
+            Wins = 0;
         }
     }
 }

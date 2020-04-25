@@ -238,6 +238,8 @@ namespace ShiftBot
                     {
                         Console.Write(player.Name, Color.Silver);
                         player.OnMessage = Player.DefaultMessageHandler;
+
+                        await player.Tell("The game is currently closed for moderators due to testing");
                     }
                     Console.WriteLine($" joined! ({new Random(player.Name.GetHashCode()).Next(0, 101)}% noob)");
 
@@ -250,14 +252,25 @@ namespace ShiftBot
 
                     Console.Write("- ", Color.Red);
                     if (player.IsMod)
-                    {
                         Console.Write(player.Name, Color.Orange);
-                    }
                     else
-                    {
                         Console.Write(player.Name, Color.Silver);
-                    }
                     Console.WriteLine(" left!");
+
+                    if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
+                    {
+                        PlayersInGame.RemoveAll(p => p.Id == player.Id);
+                        if (PlayersSafe.Keys.FirstOrDefault(p => p.Id == player.Id) != null)
+                            PlayersSafe.Remove(player);
+
+                        if (2 * PlayersSafe.Count >= PlayersInGame.Count)
+                        {
+                            if (PlayersSafe.Count > 1)
+                                await Say($"Round over! Players not finished are eliminated!");
+                            await ContinueGame();
+                        }
+                    }
+
                     break;
 
                 case MessageType.PlayerGod:
@@ -356,10 +369,7 @@ namespace ShiftBot
         {
             if (PlayersSafe.Count > 0)
             {
-                TimeSpan ts = DateTime.Now - startTime;
-                //string elapsedTime = String.Format("{0:0}.{1:00}", ts.TotalSeconds, ts.Milliseconds / 10);
-
-                string display = TimeToString((TimeSpan)(DateTime.Now - startTime));
+                string display = TimeToString(DateTime.Now - startTime);
 
                 if (PlayersSafe.Count > 2)
                     for (int i = PlayersSafe.Count - 3; i < PlayersSafe.Count; i++)

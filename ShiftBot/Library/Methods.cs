@@ -388,16 +388,29 @@ namespace ShiftBot
                     if (map[1, 0, y].Id == 11)
                         coins++;
 
-            /*
             for (int y = 0; y < 22; y++)
             {
                 if (map[1, 0, y].Id == 71)
                 {
-                    
+                    await PlaceBlock(1, TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 96);
+                }
+                else if (map[1, 37, y].Id == 71)
+                {
+                    await PlaceBlock(1, TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 96);
                 }
             }
-            */
 
+            for (int x = 0; x < 38; x++)
+            {
+                if (map[1, x, 0].Id == 71)
+                {
+                    await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 96);
+                }
+                else if (map[1, x, 21].Id == 71)
+                {
+                    await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 96);
+                }
+            }
         }
 
         /// <summary>
@@ -495,13 +508,13 @@ namespace ShiftBot
                     var chose = new List<MapInfo>();
                     foreach (MapVote mv in MapVoteSigns)
                     {
-                        if (maxVotes < mv.Votes)
+                        if (maxVotes < mv.Voters.Count)
                         {
-                            maxVotes = mv.Votes;
+                            maxVotes = mv.Voters.Count;
                             chose.Clear();
                             chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
                         }
-                        else if (maxVotes == mv.Votes)
+                        else if (maxVotes == mv.Voters.Count)
                         {
                             chose.Add(Maps.FirstOrDefault(map => map.Id == mv.MapId));
                         }
@@ -539,21 +552,31 @@ namespace ShiftBot
                         PlayersSafe = new Dictionary<Player, TimeSpan>();
 
                         foreach (Player p in Players)
-                        {
-                            await SayCommand($"reset {p.Name}");
-                            await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
-                            PlayersInGame.Add(p);
-                        }
+                            if (!p.Afk && p.IsMod)
+                            {
+                                await SayCommand($"reset {p.Name}");
+                                await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
+                                PlayersInGame.Add(p);
+                            }
 
                         if (PlayersInGame.Count < 3)
                         {
                             isTrainMode = true;
-                            await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
+                            //await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
                         }
                         else
                         {
                             isTrainMode = false;
                         }
+
+                        // Temporary
+                        isTrainMode = false;
+
+                        foreach (Player p in Players)
+                            if (!isTrainMode)
+                            {
+                                Profiles[p.Name].Plays++;
+                            }
 
                         Console.Write("* ", Color.Silver);
                         Console.Write("NEW GAME! ");
@@ -592,13 +615,16 @@ namespace ShiftBot
                     };
 
                     int k = Math.Max(35 - round * 5, 10);
-                    //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
                     Eliminator = new System.Timers.Timer(k * 1000);
                     Eliminator.Elapsed += async (object s, ElapsedEventArgs e) =>
                     {
                         if (PlayersSafe.Count == 1)
                         {
                             await Say($"{PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
+                            if (!isTrainMode)
+                            {
+                                Profiles[PlayersSafe.ElementAt(0).Key.Name].Wins++;
+                            }
                         }
                         else
                         {
@@ -643,9 +669,14 @@ namespace ShiftBot
                     firstPerson = DateTime.Now;
 
                     int k = Math.Max(35 - round * 5, 10);
-                    //int k = 5000 * Math.Min((int)Math.Ceiling(PlayersInGame.Count / 5f), 5);
                     string s = $"{k} seconds left!";
                     await Say($"{player.Name.ToUpper()} {(PlayersInGame.Count > 2 ? "finished! " + s : "won!")}");
+
+                    if (!isTrainMode && PlayersInGame.Count == 2)
+                    {
+                        Profiles[player.Name].Wins++;
+                    }
+
                     Eliminator.Start();
                 }
 
@@ -665,6 +696,12 @@ namespace ShiftBot
                     new Formatter(elapsedTime, Color.Green),
                 };
                 Console.WriteLineFormatted("    {0}. {1} in {2}", Color.Silver, format);
+
+                if (!isTrainMode)
+                {
+                    Profiles[player.Name].Rounds++;
+                    saveProfiles();
+                }
 
                 if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
                 {
