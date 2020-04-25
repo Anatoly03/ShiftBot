@@ -8,7 +8,7 @@
 
 ## Setup
 
-### Create the `cookie.txt` file
+### Create the cookie file
 
 To login, create the file `cookie.txt` at the level of `Program.cs` The first line defines the login style, the second line the TOKEN.
 
@@ -26,18 +26,21 @@ token
 TOKEN
 ```
 
-### Create the `config.txt` file
+### Create the configuration file
 
-The configuration file keeps individual settings like worldid
+The file `config.txt` keeps individual settings like worldid
 
 Example for a 100x100 world:
 
 ```
 corner 31 64
 worldid tPy8SPndRwTI
+save false
 ```
 
-- The `corner x y` defines the top left corner of the level, **not** the arrows. So the minimum value should be 1 1 (for)
+- `corner x y` defines the top left corner of the level, **not** the arrows. So the minimum value should be 1 1 (for)
+- `worldid id` defines the world to connect
+- `save bool` defines wether player data should be saved or not.
 
 ## Game Process
 

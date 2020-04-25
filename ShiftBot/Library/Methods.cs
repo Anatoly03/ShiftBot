@@ -552,7 +552,7 @@ namespace ShiftBot
                         PlayersSafe = new Dictionary<Player, TimeSpan>();
 
                         foreach (Player p in Players)
-                            if (!p.Afk && p.IsMod)
+                            if (!p.Afk)
                             {
                                 await SayCommand($"reset {p.Name}");
                                 await SayCommand($"tp {p.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
@@ -566,11 +566,10 @@ namespace ShiftBot
                         }
                         else
                         {
-                            isTrainMode = false;
+                            isTrainMode = !isSavingData; // If you are saving data (true) then training mode is not (false), then data is saved!
+                            if (isTrainMode)
+                                await Say($"This bot does not save players statistics.");
                         }
-
-                        // Temporary
-                        isTrainMode = false;
 
                         foreach (Player p in Players)
                             if (!isTrainMode)

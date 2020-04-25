@@ -44,6 +44,7 @@ namespace ShiftBot
         public static bool isBuilding;
         public static bool isDoorOpen;
         public static bool isTrainMode;
+        public static bool isSavingData;
 
         public static System.Timers.Timer Tick;
         public static JsonSerializerSettings Json_settings = new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto, Formatting = Formatting.Indented };
@@ -104,6 +105,10 @@ namespace ShiftBot
                             new MapVote(2, TopLeftShiftCoord.X + 22, TopLeftShiftCoord.Y + 26),
                             new MapVote(3, TopLeftShiftCoord.X + 24, TopLeftShiftCoord.Y + 26),
                         };
+                        break;
+
+                    case "save":
+                        isSavingData = param[1] == "true";
                         break;
                 }
             }
