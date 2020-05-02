@@ -60,23 +60,48 @@ namespace ShiftBot
                     break;
 
                 case "help":
-                    await player.Tell(".aminoob - shows your noob percentage");
-                    await player.Tell(".stats, .s - shows your player staticstics");
+                    await player.Tell(".aminoob(nub/n00b/neeb/newb) - shows your noob percentage");
+                    await player.Tell(".isnoob(nub/n00b/neeb/newb) player - shows the noob percentage of another player");
+                    await player.Tell(".stats, .s <profile?> - shows player staticstics");
                     break;
 
                 case "stats":
                 case "s":
-                    await player.Tell($"You have: {profile.Wins} wins, {profile.Points} points, {profile.Plays} plays");
+                    if (c.ArgNum > 0)
+                    {
+                        string p = c[0].ToLower();
+                        if (Profiles[p] != null)
+                        {
+                            await player.Tell($"{Profiles[p].Name.ToUpper()} has: {Profiles[p].Wins} wins, {Profiles[p].Points} points, {Profiles[p].Plays} plays");
+                        }
+                        else
+                        {
+                            await player.Tell($"{c[0].ToUpper()} does not exist? Typo?");
+                        }
+                    }
+                    else
+                        await player.Tell($"You have: {profile.Wins} wins, {profile.Points} points, {profile.Plays} plays");
                     break;
 
-                case "aminub":
                 case "aminoob":
+                case "aminub":
                 case "amin00b":
                 case "amineeb":
                 case "aminewb":
                     {
                         int i = new Random(player.Name.GetHashCode()).Next(0, 101);
                         await player.Tell($"You're a noob with a probability of {i}%");
+                    }
+                    break;
+
+                case "isnoob":
+                case "isnub":
+                case "isn00b":
+                case "isneeb":
+                case "isnewb":
+                    {
+                        int i = new Random(c[0].ToLower().GetHashCode()).Next(0, 101);
+                        await player.Tell($"That string is {i}% noob today!");
                     }
                     break;
             }
@@ -89,8 +114,9 @@ namespace ShiftBot
             {
                 case "help":
                     await player.Tell(".fullname, .name - set the world name to.. (.name renames the prefix)");
-                    await player.Tell(".scan worldid - opens a scanner in a new world");
-                    await player.Tell(".kill, .start - continue the game process (eliminate players or start game)");
+                    await player.Tell(".scanner worldid - opens a scanner in a new world");
+                    await player.Tell(".kill, .start, .resume - continue the game process (eliminate players or start game)");
+                    await player.Tell(".stop, .pause - abort the game process");
                     await DefaultMessageHandler(c); //  For complete informations without rewriting code.
                     break;
 
@@ -106,6 +132,7 @@ namespace ShiftBot
 
                 case "kill":
                 case "start":
+                case "resume":
                     await Task.Run(async () =>
                     {
                         if (!isBuilding)
@@ -133,6 +160,7 @@ namespace ShiftBot
                     break;
 
                 case "stop":
+                case "pause":
                     await AbortGame();
                     break;
 
