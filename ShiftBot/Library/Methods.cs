@@ -529,6 +529,8 @@ namespace ShiftBot
                     {
                         newMap = chose.ElementAt(new Random().Next(0, chose.Count));
                     }
+
+                    await PlaceSign(TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 58, $"You'll be playing now:\n{newMap.Title}\nBy {newMap.Creator}\n[Difficulty: {newMap.Difficulty}]", 1);
                     await BuildMap(newMap, isGameAborted.Token);
                     await CreateExit();
 
@@ -567,9 +569,13 @@ namespace ShiftBot
                         else
                         {
                             isTrainMode = !isSavingData; // If you are saving data (true) then training mode is not (false), then data is saved!
-                            if (isTrainMode)
-                                await Say($"This bot does not save players statistics.");
+                            /*if (isTrainMode)
+                                await Say($"This bot does not save players statistics.");*/
                         }
+
+                        // REMOVE SOON
+                        await Say($"This bot does not save players statistics, yet. Blame the staff team for not implementing coin doors.");
+                        // REMOVE SOON
 
                         foreach (Player p in Players)
                             if (!isTrainMode)
@@ -702,7 +708,7 @@ namespace ShiftBot
                     saveProfiles();
                 }
 
-                if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8)
+                if (2 * PlayersSafe.Count >= PlayersInGame.Count) // 50 % completed - eliminate (For 5 players: 3, For 16 players: 8; Minimum: 3 Players, wait for 2)
                 {
                     if (PlayersSafe.Count > 1)
                         await Say($"Round over! Players not finished are eliminated!");

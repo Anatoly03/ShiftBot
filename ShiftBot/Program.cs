@@ -374,7 +374,8 @@ namespace ShiftBot
         {
             if (PlayersSafe.Count > 0)
             {
-                string display = TimeToString(DateTime.Now - startTime);
+                // {(PlayersInGame.Count > 2 ? $"# T{TimeToString(DateTime.Now - startTime)}" : "")}
+                string display = $"Round {round} - {TimeToString(DateTime.Now - startTime)}";
 
                 if (PlayersSafe.Count > 2)
                     for (int i = PlayersSafe.Count - 3; i < PlayersSafe.Count; i++)

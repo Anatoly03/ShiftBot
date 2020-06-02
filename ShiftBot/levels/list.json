@@ -5,12 +5,12 @@
     "Creator": "Anatoly",
     "Difficulty": 0
   },
-  {
+  /*{
     "Id": 1,
     "Title": "Easter Ortodoux Place",
     "Creator": "Edilight2003",
     "Difficulty": 2
-  },
+  },*/
   {
     "Id": 2,
     "Title": "Black",
@@ -88,5 +88,23 @@
     "Title": "Temple of Legends",
     "Creator": "Anatoly",
     "Difficulty": 4
+  },
+  {
+    "Id": 18,
+    "Title": "CC Race",
+    "Creator": "MrMatsBoy",
+    "Difficulty": 1
+  },
+  {
+    "Id": 19,
+    "Title": "Meteors",
+    "Creator": "Anatoly",
+    "Difficulty": 4
+  },
+  {
+    "Id": 20,
+    "Title": "Space Mission",
+    "Creator": "MrMatsBoy",
+    "Difficulty": 3
   }
 ]

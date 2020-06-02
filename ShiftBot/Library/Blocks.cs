@@ -87,6 +87,23 @@ namespace ShiftBot
         }
     }
 
+    /*public class Switch : Block
+    {
+        publics??
+
+        public Switch(what do we need?) : base(i)
+        {
+            init publics
+        }
+
+        public override async Task Place(int l, int x, int y)
+        {
+            if (x >= 0 && y >= 0 && x < Program.Width && y < Program.Height)
+                if (Program.World[l, x, y].Id != Id)
+                    await Program.Con.SendAsync(MessageType.PlaceBlock, l, x, y, Id, publics);
+        }
+    }*/
+
     /*
      *  Coordinates
      */
