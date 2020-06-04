@@ -5,7 +5,9 @@
     "Creator": "Anatoly",
     "Difficulty": 0
   },
-  /*{
+  /* EASTER THEME
+
+  {
     "Id": 1,
     "Title": "Easter Ortodoux Place",
     "Creator": "Edilight2003",
@@ -95,12 +97,14 @@
     "Creator": "MrMatsBoy",
     "Difficulty": 1
   },
+  /* POSS TO GET STUCK
+
   {
     "Id": 19,
     "Title": "Meteors",
     "Creator": "Anatoly",
     "Difficulty": 4
-  },
+  },*/
   {
     "Id": 20,
     "Title": "Space Mission",

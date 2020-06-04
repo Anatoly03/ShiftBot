@@ -286,5 +286,37 @@
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
+  },
+  "achgee": {
+    "Name": "achgee",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "meta_nebula": {
+    "Name": "meta_nebula",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "luciferx": {
+    "Name": "luciferx",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "pito": {
+    "Name": "pito",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
   }
 }

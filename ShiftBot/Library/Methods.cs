@@ -46,6 +46,18 @@ namespace ShiftBot
             World[1, x, y] = new Portal(id, morph, _p_id, _t_id, _flip);
         }
 
+        public static async Task PlaceSwitch(int x, int y, int id, int sid)
+        {
+            await Con.SendAsync(MessageType.PlaceBlock, 1, x, y, id, sid);
+            World[1, x, y] = new Switch(id, sid);
+        }
+
+        public static async Task PlaceSwitchDoor(int x, int y, int id, int sid, bool inv)
+        {
+            await Con.SendAsync(MessageType.PlaceBlock, 1, x, y, id, sid, inv);
+            World[1, x, y] = new SwitchDoor(id, sid, inv);
+        }
+
         public static async Task Say(string message) => await Con.SendAsync(MessageType.Chat, "[Bot] " + message);
         public static async Task SayCommand(string message) => await Con.SendAsync(MessageType.Chat, "/" + message);
         public static async Task SayPrivate(string player, string msg) => await Con.SendAsync(MessageType.Chat, "/pm " + player + " [Bot] " + msg);
@@ -116,7 +128,7 @@ namespace ShiftBot
             await Task.Delay(25);
             await PlaceBlock(1, TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 13);
             await Task.Delay(25);
-            await PlaceBlock(1, TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 13);
+            await PlaceBlock(1, TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 0);
         }
 
         /// <summary>
@@ -385,18 +397,21 @@ namespace ShiftBot
             int coins = 0;
             for (int y = 0; y < 22; y++)
                 for (int x = 0; x < 38; x++)
-                    if (map[1, 0, y].Id == 11)
+                    if (map[1, x, y].Id == 11)
                         coins++;
 
             for (int y = 0; y < 22; y++)
             {
                 if (map[1, 0, y].Id == 71)
                 {
-                    await PlaceBlock(1, TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 96);
+                    //await PlaceBlock(1, TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 96);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 100, coins, true);
                 }
-                else if (map[1, 37, y].Id == 71)
+
+                if (map[1, 37, y].Id == 71)
                 {
-                    await PlaceBlock(1, TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 96);
+                    //await PlaceBlock(1, TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 96);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 100, coins, true);
                 }
             }
 
@@ -404,11 +419,14 @@ namespace ShiftBot
             {
                 if (map[1, x, 0].Id == 71)
                 {
-                    await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 96);
+                    //await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 96);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 100, coins, true);
                 }
-                else if (map[1, x, 21].Id == 71)
+
+                if (map[1, x, 21].Id == 71)
                 {
-                    await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 96);
+                    //await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 96);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 100, coins, true);
                 }
             }
         }
@@ -429,7 +447,8 @@ namespace ShiftBot
         {
             await PlaceBlock(1, TopLeftShiftCoord.X + 15, TopLeftShiftCoord.Y + 22, 96);
             await PlaceBlock(1, TopLeftShiftCoord.X + 16, TopLeftShiftCoord.Y + 22, 0);
-            await PlaceBlock(1, TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 70);
+            //await PlaceBlock(1, TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 70);
+            await PlaceSwitch(TopLeftShiftCoord.X + 18, TopLeftShiftCoord.Y + 22, 98, 261);
         }
 
         /// <summary>
@@ -661,7 +680,7 @@ namespace ShiftBot
         }
 
         /// <summary>
-        /// Occurs when <i>any</i> player touched the crown.
+        /// Occurs when a player wins the game.
         /// </summary>
         public static async Task PlayerWon(Player player)
         {
@@ -688,8 +707,9 @@ namespace ShiftBot
                 string elapsedTime = TimeToString(ts);
                 PlayersSafe.Add(player, ts);
 
-                await SayCommand($"reset {player.Name}");
-                await SayCommand($"tp {player.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
+                //await SayCommand($"reset {player.Name}");
+                await SayCommand($"effect {player.Name} clear");
+                //await SayCommand($"tp {player.Name} {TopLeftShiftCoord.X + 16} {TopLeftShiftCoord.Y + 22}");
 
                 await SayPrivate(player, $"Your Time: {elapsedTime}s");
                 await UpdateSign();

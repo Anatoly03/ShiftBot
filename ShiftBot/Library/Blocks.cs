@@ -87,22 +87,43 @@ namespace ShiftBot
         }
     }
 
-    /*public class Switch : Block
+    // Local Switch + Switch Reset (-1 resets all)
+    public class Switch : Block
     {
-        publics??
+        public int SwitchId { get; set; }
 
-        public Switch(what do we need?) : base(i)
+        public Switch(int i, int id) : base(i)
         {
-            init publics
+            SwitchId = id;
         }
 
         public override async Task Place(int l, int x, int y)
         {
             if (x >= 0 && y >= 0 && x < Program.Width && y < Program.Height)
                 if (Program.World[l, x, y].Id != Id)
-                    await Program.Con.SendAsync(MessageType.PlaceBlock, l, x, y, Id, publics);
+                    await Program.Con.SendAsync(MessageType.PlaceBlock, l, x, y, Id, SwitchId);
         }
-    }*/
+    }
+
+    // SwitchDoor
+    public class SwitchDoor : Block
+    {
+        public int SwitchId { get; set; }
+        public bool Inverted { get; set; }
+
+        public SwitchDoor(int i, int id, bool b) : base(i)
+        {
+            SwitchId = id;
+            Inverted = b;
+        }
+
+        public override async Task Place(int l, int x, int y)
+        {
+            if (x >= 0 && y >= 0 && x < Program.Width && y < Program.Height)
+                if (Program.World[l, x, y].Id != Id)
+                    await Program.Con.SendAsync(MessageType.PlaceBlock, l, x, y, Id, SwitchId, Inverted);
+        }
+    }
 
     /*
      *  Coordinates

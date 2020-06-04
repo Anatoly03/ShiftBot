@@ -158,6 +158,7 @@ namespace ShiftBot
         static async Task Main3(Message m)
         {
             Player player;
+            Player playerInGame;
 
             switch (m.Type)
             {
@@ -209,6 +210,18 @@ namespace ShiftBot
                                     case 94:
                                         int r = m.GetInt(index++);
                                         World[1, _x, _y] = new Effect(foregroundId, r);
+                                        break;
+
+                                    case 98:
+                                    case 99:
+                                        int sid = m.GetInt(index++);
+                                        World[1, _x, _y] = new Switch(foregroundId, sid);
+                                        break;
+
+                                    case 100:
+                                        int sid2 = m.GetInt(index++);
+                                        bool inv = m.GetBool(index++);
+                                        World[1, _x, _y] = new SwitchDoor(foregroundId, sid2, inv);
                                         break;
                                 }
                             }
@@ -285,7 +298,7 @@ namespace ShiftBot
                     
                 case MessageType.PlayerMove:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
-                    var playerInGame = PlayersInGame.FirstOrDefault(p => p.Id == m.GetInt(0));
+                    playerInGame = PlayersInGame.FirstOrDefault(p => p.Id == m.GetInt(0));
 
                     {
                         int facex = m.GetInt(3);
@@ -310,8 +323,15 @@ namespace ShiftBot
 
                     break;
 
-                case MessageType.Won:
-                    await PlayerWon(Players.FirstOrDefault(p => p.Id == m.GetInt(0)));
+                //case MessageType.Won:
+                //    await PlayerWon(Players.FirstOrDefault(p => p.Id == m.GetInt(0)));
+                case (MessageType) 32:
+                    player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
+                    playerInGame = PlayersInGame.FirstOrDefault(p => p.Id == m.GetInt(0));
+
+                    if (m.GetInt(2) == 261)
+                        if (playerInGame != null)
+                            await PlayerWon(Players.FirstOrDefault(p => p.Id == m.GetInt(0)));
                     break;
 
                 case MessageType.PlaceBlock:
@@ -350,6 +370,20 @@ namespace ShiftBot
                         case 94:
                             int r = m.GetInt(5);
                             World[l, x, y] = new Effect(m.GetInt(4), r);
+                            break;
+
+                        // Switches
+                        case 98:
+                        case 99:
+                            int sid = m.GetInt(5);
+                            World[1, x, y] = new Switch(m.GetInt(4), sid);
+                            break;
+
+                        // Switch Doors
+                        case 100:
+                            int sid2 = m.GetInt(5);
+                            bool inv = m.GetBool(5);
+                            World[1, x, y] = new SwitchDoor(m.GetInt(4), sid2, inv);
                             break;
                     }
                     break;
