@@ -55,7 +55,7 @@ namespace ShiftBot
         public static async Task PlaceSwitchDoor(int x, int y, int id, int sid, bool inv)
         {
             await Con.SendAsync(MessageType.PlaceBlock, 1, x, y, id, sid, inv);
-            World[1, x, y] = new SwitchDoor(id, sid, inv);
+            World[1, x, y] = new Door(id, sid, inv);
         }
 
         public static async Task Say(string message) => await Con.SendAsync(MessageType.Chat, "[Bot] " + message);

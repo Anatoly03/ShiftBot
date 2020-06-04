@@ -221,7 +221,7 @@ namespace ShiftBot
                                     case 100:
                                         int sid2 = m.GetInt(index++);
                                         bool inv = m.GetBool(index++);
-                                        World[1, _x, _y] = new SwitchDoor(foregroundId, sid2, inv);
+                                        World[1, _x, _y] = new Door(foregroundId, sid2, inv);
                                         break;
                                 }
                             }
@@ -383,7 +383,7 @@ namespace ShiftBot
                         case 100:
                             int sid2 = m.GetInt(5);
                             bool inv = m.GetBool(5);
-                            World[1, x, y] = new SwitchDoor(m.GetInt(4), sid2, inv);
+                            World[1, x, y] = new Door(m.GetInt(4), sid2, inv);
                             break;
                     }
                     break;

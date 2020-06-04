@@ -124,6 +124,18 @@ namespace ShiftBot
                                     int r = m.GetInt(index++);
                                     World[1, x, y] = new Effect(foregroundId, r);
                                     break;
+
+                                case 98:
+                                case 99:
+                                    int sid = m.GetInt(index++);
+                                    World[1, x, y] = new Switch(foregroundId, sid);
+                                    break;
+
+                                case 100:
+                                    int sid2 = m.GetInt(index++);
+                                    bool inv = m.GetBool(index++);
+                                    World[1, x, y] = new Door(foregroundId, sid2, inv);
+                                    break;
                             }
                         }
 
@@ -173,6 +185,20 @@ namespace ShiftBot
                         case 94:
                             int r = m.GetInt(5);
                             World[L, X, Y] = new Effect(m.GetInt(4), r);
+                            break;
+
+                        // Switches
+                        case 98:
+                        case 99:
+                            int sid = m.GetInt(5);
+                            World[L, X, Y] = new Switch(m.GetInt(4), sid);
+                            break;
+
+                        // Switch Doors
+                        case 100:
+                            int sid2 = m.GetInt(5);
+                            bool inv = m.GetBool(5);
+                            World[L, X, Y] = new Door(m.GetInt(4), sid2, inv);
                             break;
                     }
                     break;

@@ -106,12 +106,12 @@ namespace ShiftBot
     }
 
     // SwitchDoor
-    public class SwitchDoor : Block
+    public class Door : Block
     {
         public int SwitchId { get; set; }
         public bool Inverted { get; set; }
 
-        public SwitchDoor(int i, int id, bool b) : base(i)
+        public Door(int i, int id, bool b) : base(i)
         {
             SwitchId = id;
             Inverted = b;

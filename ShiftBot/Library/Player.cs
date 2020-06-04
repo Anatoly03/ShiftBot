@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Drawing;
+using Console = Colorful.Console;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -123,16 +125,30 @@ namespace ShiftBot
                 case "fullname":
                     string fulltitle = c[0];
                     await SayCommand($"title {fulltitle}");
+
+                    Console.Write("@ ", Color.Yellow);
+                    Console.Write(player.Name, Color.Orange);
+                    Console.Write($" set title to ");
+                    Console.WriteLine(fulltitle, Color.Cyan);
                     break;
 
                 case "name":
                     string title = c[0];
                     await SayCommand($"title {title}: CC Shift");
+
+                    Console.Write("@ ", Color.Yellow);
+                    Console.Write(player.Name, Color.Orange);
+                    Console.Write($" set title to ");
+                    Console.WriteLine(title + ": CC Shift", Color.Cyan);
                     break;
 
                 case "kill":
                 case "start":
                 case "resume":
+                    Console.Write("@ ", Color.Yellow);
+                    Console.Write(player.Name, Color.Orange);
+                    Console.WriteLine(" forced to end the round", Color.Cyan);
+
                     await Task.Run(async () =>
                     {
                         if (!isBuilding)
@@ -160,13 +176,20 @@ namespace ShiftBot
                     break;
 
                 case "stop":
+                case "abort":
                 case "pause":
+                    Console.Write("@ ", Color.Yellow);
+                    Console.Write(player.Name, Color.Orange);
+                    Console.WriteLine(" aborted the game", Color.Cyan);
                     await AbortGame();
                     break;
 
                 case "scanner":
                     if (c.ArgNum > 0)
                     {
+                        Console.Write("@ ", Color.Yellow);
+                        Console.Write(player.Name, Color.Orange);
+                        Console.WriteLine(" proposed to open a scanner", Color.Cyan);
                         await OpenScanner(c[0], player);
                     }
                     break;
