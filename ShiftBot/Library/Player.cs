@@ -147,7 +147,6 @@ namespace ShiftBot
                 case "resume":
                     Console.Write("@ ", Color.Yellow);
                     Console.Write(player.Name, Color.Orange);
-                    Console.WriteLine(" forced to end the round", Color.Cyan);
 
                     await Task.Run(async () =>
                     {
@@ -155,9 +154,13 @@ namespace ShiftBot
                         {
                             if (PlayersInGame.Count > 0)
                                 if (PlayersSafe.Count == 0)
+                                {
+                                    Console.WriteLine(" forced to eliminate everyone!");
                                     await Say($"Round was forced to end! Everyone's eliminated!");
+                                }
                                 else if (PlayersSafe.Count == 1)
                                 {
+                                    Console.WriteLine(" forced to end the round!");
                                     await Say($"Round was forced to end! {PlayersSafe.ElementAt(0).Key.Name.ToUpper()} won!");
 
                                     if (!isTrainMode)
@@ -168,8 +171,11 @@ namespace ShiftBot
                                 }
                                 else
                                 {
+                                    Console.WriteLine(" forced to end the round!");
                                     await Say($"Round was forced to end! Players not finished are eliminated!");
                                 }
+                            else
+                                Console.WriteLine(" started the game!");
                             await ContinueGame();
                         }
                     });
@@ -191,6 +197,15 @@ namespace ShiftBot
                         Console.Write(player.Name, Color.Orange);
                         Console.WriteLine(" proposed to open a scanner", Color.Cyan);
                         await OpenScanner(c[0], player);
+                    }
+                    break;
+
+                case "regen":
+                    switch (c[0])
+                    {
+                        case "maps":
+                            await RegenerateMapVoters();
+                            break;
                     }
                     break;
 

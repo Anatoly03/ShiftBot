@@ -405,13 +405,13 @@ namespace ShiftBot
                 if (map[1, 0, y].Id == 71)
                 {
                     //await PlaceBlock(1, TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 96);
-                    await PlaceSwitchDoor(TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 100, coins, true);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X, TopLeftShiftCoord.Y + y, 104, coins, false);
                 }
 
                 if (map[1, 37, y].Id == 71)
                 {
                     //await PlaceBlock(1, TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 96);
-                    await PlaceSwitchDoor(TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 100, coins, true);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + 37, TopLeftShiftCoord.Y + y, 104, coins, false);
                 }
             }
 
@@ -420,13 +420,13 @@ namespace ShiftBot
                 if (map[1, x, 0].Id == 71)
                 {
                     //await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 96);
-                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 100, coins, true);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y, 104, coins, false);
                 }
 
                 if (map[1, x, 21].Id == 71)
                 {
                     //await PlaceBlock(1, TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 96);
-                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 100, coins, true);
+                    await PlaceSwitchDoor(TopLeftShiftCoord.X + x, TopLeftShiftCoord.Y + 21, 104, coins, false);
                 }
             }
         }
@@ -472,11 +472,11 @@ namespace ShiftBot
                 if (currentMap != null)
                 {
                     if (k.Id != currentMap.Id)
-                        buffer.Insert(r.Next(0, buffer.Count), k);
+                        buffer.Insert(r.Next(0, buffer.Count + 1), k);
                 }
                 else
                 {
-                    buffer.Insert(r.Next(0, buffer.Count), k);
+                    buffer.Insert(r.Next(0, buffer.Count + 1), k);
                 }
             }
 
@@ -580,21 +580,17 @@ namespace ShiftBot
                                 PlayersInGame.Add(p);
                             }
 
-                        if (PlayersInGame.Count < 3)
+                        if (PlayersInGame.Count < 4)
                         {
                             isTrainMode = true;
-                            //await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
+                            await Say($"Not enough players! Traning mode is enabled! Statistics will not be updated!");
                         }
                         else
                         {
                             isTrainMode = !isSavingData; // If you are saving data (true) then training mode is not (false), then data is saved!
-                            /*if (isTrainMode)
-                                await Say($"This bot does not save players statistics.");*/
+                            if (isTrainMode)
+                                await Say($"This bot does not save players statistics.");
                         }
-
-                        // REMOVE SOON
-                        await Say($"This bot does not save players statistics, yet. Blame the staff team for not implementing coin doors.");
-                        // REMOVE SOON
 
                         foreach (Player p in Players)
                             if (!isTrainMode)

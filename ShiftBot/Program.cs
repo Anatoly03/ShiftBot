@@ -100,10 +100,10 @@ namespace ShiftBot
                     case "corner":
                         TopLeftShiftCoord = new Coordinate(int.Parse(param[1]), int.Parse(param[2]));
                         MapVoteSigns = new List<MapVote> {
-                            new MapVote(0, TopLeftShiftCoord.X + 13, TopLeftShiftCoord.Y + 26),
-                            new MapVote(1, TopLeftShiftCoord.X + 15, TopLeftShiftCoord.Y + 26),
-                            new MapVote(2, TopLeftShiftCoord.X + 22, TopLeftShiftCoord.Y + 26),
-                            new MapVote(3, TopLeftShiftCoord.X + 24, TopLeftShiftCoord.Y + 26),
+                            new MapVote(0, TopLeftShiftCoord.X + 12, TopLeftShiftCoord.Y + 26),
+                            new MapVote(1, TopLeftShiftCoord.X + 14, TopLeftShiftCoord.Y + 26),
+                            new MapVote(2, TopLeftShiftCoord.X + 23, TopLeftShiftCoord.Y + 26),
+                            new MapVote(3, TopLeftShiftCoord.X + 25, TopLeftShiftCoord.Y + 26),
                         };
                         break;
 
@@ -159,6 +159,14 @@ namespace ShiftBot
         {
             Player player;
             Player playerInGame;
+
+
+           /*if (m.Type != MessageType.PlayerMove)
+                if (m.Type != MessageType.Chat)
+                {
+                    Console.WriteLine(m.Type);
+                    Console.WriteLine(m);
+                }*/
 
             switch (m.Type)
             {
@@ -219,6 +227,7 @@ namespace ShiftBot
                                         break;
 
                                     case 100:
+                                    case 104:
                                         int sid2 = m.GetInt(index++);
                                         bool inv = m.GetBool(index++);
                                         World[1, _x, _y] = new Door(foregroundId, sid2, inv);
@@ -275,6 +284,7 @@ namespace ShiftBot
                         Console.Write(player.Name, Color.Silver);
                     Console.WriteLine(" left!");
 
+                    // Did he leave while in game?
                     if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
                     {
                         PlayersInGame.RemoveAll(p => p.Id == player.Id);
@@ -294,6 +304,29 @@ namespace ShiftBot
                 case MessageType.PlayerGod:
                     player = Players.FirstOrDefault(p => p.Id == m.GetInt(0));
                     player.Afk = m.GetBool(1);
+
+                    // Did he use god mode to cheat?
+                    if (PlayersInGame.FirstOrDefault(p => p.Id == player.Id) != null)
+                    {
+                        PlayersInGame.RemoveAll(p => p.Id == player.Id);
+                        if (PlayersSafe.Keys.FirstOrDefault(p => p.Id == player.Id) != null)
+                            PlayersSafe.Remove(player);
+
+                        if (2 * PlayersSafe.Count >= PlayersInGame.Count)
+                        {
+                            if (PlayersSafe.Count > 1)
+                                await Say($"Round over! Players not finished are eliminated!");
+                            await ContinueGame();
+                        }
+
+                        await player.Tell($"You are eliminated!");
+                        await SayCommand($"takegod {player.Name}");
+                        await SayCommand($"reset {player.Name}");
+                    }
+                    /*else
+                    {
+                        await player.Tell($"You are {(player.Afk ? "now" : "no longer")} afk!");
+                    }*/
                     break;
                     
                 case MessageType.PlayerMove:
@@ -307,11 +340,16 @@ namespace ShiftBot
                         double mx = m.GetDouble(5);
                         double my = m.GetDouble(6);
 
+                        // If ingame, check when to close the door
                         if (playerInGame != null)
                             if (mx > TopLeftShiftCoord.X + 1 && mx < TopLeftShiftCoord.X + 42 && my > TopLeftShiftCoord.Y + 1 && my < TopLeftShiftCoord.X + 20)
                                 if (isDoorOpen)
+                                {
+                                    Console.WriteLine("...1");
                                     EntranceMovement.Start();
+                                }
 
+                        // If not afk: Allow to vote
                         if (!player.Afk)
                             if (!isBuilding)
                                 foreach (MapVote mv in MapVoteSigns)
@@ -319,6 +357,16 @@ namespace ShiftBot
                                         if (Math.Pow(mx - mv.X, 2) + Math.Pow(my - mv.Y, 2) < 0.5)
                                             if (facey == -1)
                                                 await mv.NewVote(player);
+
+                        // Users in godmode should not annoy players in game
+                        if (player.Afk && playerInGame == null)
+                            if (mx > TopLeftShiftCoord.X - 1 && mx < TopLeftShiftCoord.X + 44 && my > TopLeftShiftCoord.Y - 1 && my < TopLeftShiftCoord.X + 22)
+                            {
+                                Console.WriteLine("...2");
+                                await SayCommand($"takegod {player.Name}");
+                                await SayCommand($"reset {player.Name}");
+                                //await SayCommand($"tp {player.Name} 49 88");
+                            }
                     }
 
                     break;
