@@ -1,5 +1,7 @@
 ﻿# Traditional Shiftbot
 
+Bot created by LeoGiaco ana Anatoly
+
 ## Table of Contents
 
 - [Setting up](#setup)
