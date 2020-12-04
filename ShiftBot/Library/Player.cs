@@ -126,7 +126,7 @@ namespace ShiftBot
                     string fulltitle = c[0];
                     await SayCommand($"title {fulltitle}");
 
-                    Console.Write("@ ", Color.Yellow);
+                    Console.Write("@ ", Color.BlueViolet);
                     Console.Write(player.Name, Color.Orange);
                     Console.Write($" set title to ");
                     Console.WriteLine(fulltitle, Color.Cyan);
@@ -136,7 +136,7 @@ namespace ShiftBot
                     string title = c[0];
                     await SayCommand($"title {title}: CC Shift");
 
-                    Console.Write("@ ", Color.Yellow);
+                    Console.Write("@ ", Color.BlueViolet);
                     Console.Write(player.Name, Color.Orange);
                     Console.Write($" set title to ");
                     Console.WriteLine(title + ": CC Shift", Color.Cyan);
@@ -145,7 +145,7 @@ namespace ShiftBot
                 case "kill":
                 case "start":
                 case "resume":
-                    Console.Write("@ ", Color.Yellow);
+                    Console.Write("@ ", Color.BlueViolet);
                     Console.Write(player.Name, Color.Orange);
 
                     await Task.Run(async () =>
@@ -184,7 +184,7 @@ namespace ShiftBot
                 case "stop":
                 case "abort":
                 case "pause":
-                    Console.Write("@ ", Color.Yellow);
+                    Console.Write("@ ", Color.BlueViolet);
                     Console.Write(player.Name, Color.Orange);
                     Console.WriteLine(" aborted the game", Color.Cyan);
                     await AbortGame();
@@ -193,7 +193,7 @@ namespace ShiftBot
                 case "scanner":
                     if (c.ArgNum > 0)
                     {
-                        Console.Write("@ ", Color.Yellow);
+                        Console.Write("@ ", Color.BlueViolet);
                         Console.Write(player.Name, Color.Orange);
                         Console.WriteLine(" proposed to open a scanner", Color.Cyan);
                         await OpenScanner(c[0], player);

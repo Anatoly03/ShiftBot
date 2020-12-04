@@ -94,5 +94,23 @@
     "Title": "Space Mission",
     "Creator": "MrMatsBoy",
     "Difficulty": 3
+  },
+  {
+    "Id": 21,
+    "Title": "Untitled Map",
+    "Creator": null,
+    "Difficulty": 0
+  },
+  {
+    "Id": 22,
+    "Title": "Untitled Map",
+    "Creator": null,
+    "Difficulty": 0
+  },
+  {
+    "Id": 23,
+    "Title": "Untitled Map",
+    "Creator": null,
+    "Difficulty": 0
   }
 ]

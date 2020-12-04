@@ -2,10 +2,10 @@
   "anatoly": {
     "Name": "anatoly",
     "IsMod": true,
-    "Plays": 1,
+    "Plays": 38,
     "Points": 0,
-    "Rounds": 1,
-    "Wins": 1
+    "Rounds": 12,
+    "Wins": 3
   },
   "leogiaco": {
     "Name": "leogiaco",
@@ -18,26 +18,26 @@
   "k_advanced": {
     "Name": "k_advanced",
     "IsMod": true,
-    "Plays": 1,
+    "Plays": 15,
     "Points": 0,
-    "Rounds": 0,
-    "Wins": 0
+    "Rounds": 4,
+    "Wins": 1
   },
   "edilight2003": {
     "Name": "edilight2003",
     "IsMod": true,
-    "Plays": 0,
+    "Plays": 22,
     "Points": 0,
-    "Rounds": 0,
-    "Wins": 0
+    "Rounds": 36,
+    "Wins": 11
   },
   "mrmatsboy": {
     "Name": "mrmatsboy",
     "IsMod": true,
-    "Plays": 0,
+    "Plays": 10,
     "Points": 0,
-    "Rounds": 0,
-    "Wins": 0
+    "Rounds": 9,
+    "Wins": 3
   },
   "mochio": {
     "Name": "mochio",
@@ -130,7 +130,7 @@
   "notion": {
     "Name": "notion",
     "IsMod": false,
-    "Plays": 0,
+    "Plays": 9,
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
@@ -258,18 +258,18 @@
   "john": {
     "Name": "john",
     "IsMod": false,
-    "Plays": 0,
+    "Plays": 13,
     "Points": 0,
-    "Rounds": 0,
+    "Rounds": 1,
     "Wins": 0
   },
   "trytu": {
     "Name": "trytu",
     "IsMod": false,
-    "Plays": 0,
+    "Plays": 9,
     "Points": 0,
-    "Rounds": 0,
-    "Wins": 0
+    "Rounds": 11,
+    "Wins": 3
   },
   "goldtom": {
     "Name": "goldtom",
@@ -306,7 +306,7 @@
   "luciferx": {
     "Name": "luciferx",
     "IsMod": false,
-    "Plays": 0,
+    "Plays": 3,
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
@@ -358,5 +358,261 @@
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
+  },
+  "pookeyj": {
+    "Name": "pookeyj",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "elementcomplete": {
+    "Name": "elementcomplete",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "red5pizza": {
+    "Name": "red5pizza",
+    "IsMod": false,
+    "Plays": 9,
+    "Points": 0,
+    "Rounds": 12,
+    "Wins": 3
+  },
+  "nemexoalliance": {
+    "Name": "nemexoalliance",
+    "IsMod": false,
+    "Plays": 1,
+    "Points": 0,
+    "Rounds": 1,
+    "Wins": 0
+  },
+  "bobo66565": {
+    "Name": "bobo66565",
+    "IsMod": false,
+    "Plays": 14,
+    "Points": 0,
+    "Rounds": 3,
+    "Wins": 0
+  },
+  "priddle": {
+    "Name": "priddle",
+    "IsMod": false,
+    "Plays": 3,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "m-nebula": {
+    "Name": "m-nebula",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "tgmw": {
+    "Name": "tgmw",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "adeluna": {
+    "Name": "adeluna",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "superrio": {
+    "Name": "superrio",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "tom120401": {
+    "Name": "tom120401",
+    "IsMod": false,
+    "Plays": 1,
+    "Points": 0,
+    "Rounds": 2,
+    "Wins": 1
+  },
+  "shadowman3333": {
+    "Name": "shadowman3333",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "regnaur": {
+    "Name": "regnaur",
+    "IsMod": false,
+    "Plays": 1,
+    "Points": 0,
+    "Rounds": 1,
+    "Wins": 0
+  },
+  "xeviax": {
+    "Name": "xeviax",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "kittens9": {
+    "Name": "kittens9",
+    "IsMod": false,
+    "Plays": 16,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "loken13": {
+    "Name": "loken13",
+    "IsMod": false,
+    "Plays": 1,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "adeit": {
+    "Name": "adeit",
+    "IsMod": false,
+    "Plays": 17,
+    "Points": 0,
+    "Rounds": 15,
+    "Wins": 2
+  },
+  "ovcu": {
+    "Name": "ovcu",
+    "IsMod": false,
+    "Plays": 1,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "tiralmo": {
+    "Name": "tiralmo",
+    "IsMod": false,
+    "Plays": 13,
+    "Points": 0,
+    "Rounds": 21,
+    "Wins": 6
+  },
+  "kkyle8": {
+    "Name": "kkyle8",
+    "IsMod": false,
+    "Plays": 3,
+    "Points": 0,
+    "Rounds": 2,
+    "Wins": 0
+  },
+  "gidey": {
+    "Name": "gidey",
+    "IsMod": false,
+    "Plays": 26,
+    "Points": 0,
+    "Rounds": 12,
+    "Wins": 1
+  },
+  "frailspark2708": {
+    "Name": "frailspark2708",
+    "IsMod": false,
+    "Plays": 4,
+    "Points": 0,
+    "Rounds": 2,
+    "Wins": 0
+  },
+  "fire": {
+    "Name": "fire",
+    "IsMod": false,
+    "Plays": 6,
+    "Points": 0,
+    "Rounds": 3,
+    "Wins": 0
+  },
+  "thesurvi": {
+    "Name": "thesurvi",
+    "IsMod": false,
+    "Plays": 10,
+    "Points": 0,
+    "Rounds": 9,
+    "Wins": 1
+  },
+  "pinbfdireal": {
+    "Name": "pinbfdireal",
+    "IsMod": false,
+    "Plays": 4,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "oooobo": {
+    "Name": "oooobo",
+    "IsMod": false,
+    "Plays": 19,
+    "Points": 0,
+    "Rounds": 4,
+    "Wins": 1
+  },
+  "joeyc": {
+    "Name": "joeyc",
+    "IsMod": false,
+    "Plays": 17,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "dragonjk": {
+    "Name": "dragonjk",
+    "IsMod": false,
+    "Plays": 5,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "exot": {
+    "Name": "exot",
+    "IsMod": false,
+    "Plays": 2,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "andy77799": {
+    "Name": "andy77799",
+    "IsMod": false,
+    "Plays": 11,
+    "Points": 0,
+    "Rounds": 4,
+    "Wins": 0
+  },
+  "jesse": {
+    "Name": "jesse",
+    "IsMod": false,
+    "Plays": 13,
+    "Points": 0,
+    "Rounds": 1,
+    "Wins": 0
+  },
+  "babimal": {
+    "Name": "babimal",
+    "IsMod": false,
+    "Plays": 4,
+    "Points": 0,
+    "Rounds": 4,
+    "Wins": 1
   }
 }
