@@ -2,15 +2,15 @@
   "anatoly": {
     "Name": "anatoly",
     "IsMod": true,
-    "Plays": 38,
+    "Plays": 46,
     "Points": 0,
-    "Rounds": 12,
+    "Rounds": 13,
     "Wins": 3
   },
   "leogiaco": {
     "Name": "leogiaco",
     "IsMod": true,
-    "Plays": 0,
+    "Plays": 1,
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
@@ -26,10 +26,10 @@
   "edilight2003": {
     "Name": "edilight2003",
     "IsMod": true,
-    "Plays": 22,
+    "Plays": 30,
     "Points": 0,
-    "Rounds": 36,
-    "Wins": 11
+    "Rounds": 42,
+    "Wins": 12
   },
   "mrmatsboy": {
     "Name": "mrmatsboy",
@@ -42,10 +42,10 @@
   "mochio": {
     "Name": "mochio",
     "IsMod": false,
-    "Plays": 0,
+    "Plays": 8,
     "Points": 0,
-    "Rounds": 0,
-    "Wins": 0
+    "Rounds": 16,
+    "Wins": 5
   },
   "polska": {
     "Name": "polska",
@@ -258,9 +258,9 @@
   "john": {
     "Name": "john",
     "IsMod": false,
-    "Plays": 13,
+    "Plays": 20,
     "Points": 0,
-    "Rounds": 1,
+    "Rounds": 6,
     "Wins": 0
   },
   "trytu": {
@@ -394,15 +394,15 @@
   "bobo66565": {
     "Name": "bobo66565",
     "IsMod": false,
-    "Plays": 14,
+    "Plays": 16,
     "Points": 0,
-    "Rounds": 3,
+    "Rounds": 5,
     "Wins": 0
   },
   "priddle": {
     "Name": "priddle",
     "IsMod": false,
-    "Plays": 3,
+    "Plays": 4,
     "Points": 0,
     "Rounds": 0,
     "Wins": 0
@@ -570,9 +570,9 @@
   "joeyc": {
     "Name": "joeyc",
     "IsMod": false,
-    "Plays": 17,
+    "Plays": 22,
     "Points": 0,
-    "Rounds": 0,
+    "Rounds": 2,
     "Wins": 0
   },
   "dragonjk": {
@@ -614,5 +614,69 @@
     "Points": 0,
     "Rounds": 4,
     "Wins": 1
+  },
+  "minimania": {
+    "Name": "minimania",
+    "IsMod": false,
+    "Plays": 7,
+    "Points": 0,
+    "Rounds": 5,
+    "Wins": 0
+  },
+  "bernando": {
+    "Name": "bernando",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "cfmgaming101": {
+    "Name": "cfmgaming101",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "nomy": {
+    "Name": "nomy",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "threewheeldrive": {
+    "Name": "threewheeldrive",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "kank": {
+    "Name": "kank",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "xtheoreofairyx": {
+    "Name": "xtheoreofairyx",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
+  },
+  "quadratix": {
+    "Name": "quadratix",
+    "IsMod": false,
+    "Plays": 0,
+    "Points": 0,
+    "Rounds": 0,
+    "Wins": 0
   }
 }

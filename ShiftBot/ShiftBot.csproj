@@ -14,6 +14,9 @@
     <Compile Remove="..\README.md\EmptyClass.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="levels\3\map.json" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\README.md" />
   </ItemGroup>
 </Project>

@@ -96,14 +96,16 @@ namespace ShiftBot
                     }
                     break;
 
-                case "isnoob":
-                case "isnub":
-                case "isn00b":
-                case "isneeb":
-                case "isnewb":
+                case "afk":
+                    if (player.Afk)
                     {
-                        int i = new Random(c[0].ToLower().GetHashCode()).Next(0, 101);
-                        await player.Tell($"That string is {i}% noob today!");
+                        player.Afk = false;
+                        await player.Tell($"You are no longer afk!");
+                    }
+                    else
+                    {
+                        player.Afk = true;
+                        await player.Tell($"You are now afk!");
                     }
                     break;
             }
@@ -188,6 +190,23 @@ namespace ShiftBot
                     Console.Write(player.Name, Color.Orange);
                     Console.WriteLine(" aborted the game", Color.Cyan);
                     await AbortGame();
+                    break;
+
+                case "clear":
+                    Console.Write("@ ", Color.BlueViolet);
+                    Console.Write(player.Name, Color.Orange);
+                    Console.WriteLine(" cleared the map!", Color.Cyan);
+                    await ClearGameArea();
+                    break;
+
+                case "build":
+                    if (c.ArgNum > 0)
+                    {
+                        Console.Write("@ ", Color.BlueViolet);
+                        Console.Write(player.Name, Color.Orange);
+                        Console.WriteLine(" built map", Color.Cyan);
+                        await BuildMap(int.Parse(c[0]));
+                    }
                     break;
 
                 case "scanner":
